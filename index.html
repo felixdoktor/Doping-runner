@@ -10,7 +10,6 @@
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       min-height: 100vh; overflow: hidden; 
-      touch-action: none; /* Zabrání nechtěnému posouvání a obnovování stránky na mobilu */
     }
     
     #ui {
@@ -28,30 +27,39 @@
       width: 95%; max-width: 800px; aspect-ratio: 2 / 1;
     }
     
-    canvas { background: #2e7d32; display: block; width: 100%; height: 100%; }
-    
-    /* ZMĚNA: Okna jsou teď fixní přes celou obrazovku (nic je neořízne) */
-    .modal {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.95);
-      display: none; flex-direction: column; justify-content: center; align-items: center;
-      text-align: center; padding: 20px; box-sizing: border-box; z-index: 1000;
+    /* Zamykání dotyků aplikováno POUZE na plátno, nezablokuje to tlačítka */
+    canvas { 
+      background: #2e7d32; display: block; width: 100%; height: 100%; 
+      touch-action: none; 
     }
-    .modal h2 { margin-top: 0; font-size: 22px; color: #fff; }
-    .modal p { font-size: 15px; max-width: 600px; line-height: 1.5; }
+    
+    /* Vyskakovací okna mají zpět svůj grafický box uprostřed obrazovky */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.85);
+      display: none; justify-content: center; align-items: center; z-index: 1000;
+    }
+    .modal-content {
+      background: #222; border: 3px solid #444; border-radius: 12px;
+      padding: 25px; text-align: center; max-width: 90%; width: 500px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.8);
+    }
+    .modal-content h2 { margin-top: 0; font-size: 22px; color: #fff; }
+    .modal-content p { font-size: 15px; line-height: 1.5; color: #ddd; }
     
     button {
       background: #4caf50; color: white; border: none; padding: 15px 30px;
-      font-size: 18px; font-weight: bold; border-radius: 6px; cursor: pointer; margin: 15px;
+      font-size: 18px; font-weight: bold; border-radius: 6px; cursor: pointer; margin-top: 15px;
+      width: 100%; max-width: 300px;
     }
     button:hover { background: #45a049; }
-    button:active { transform: scale(0.95); } /* Efekt zmáčknutí */
+    button:active { transform: scale(0.95); }
     
     .quiz-btn {
-      background: #2196f3; width: 100%; max-width: 400px; padding: 12px; font-size: 15px; margin: 5px;
+      background: #2196f3; width: 100%; max-width: 100%; padding: 12px; font-size: 15px; margin: 5px 0;
     }
     .quiz-btn:hover { background: #1976d2; }
-    #question-text { font-size: 18px; margin-bottom: 20px; color: #ffeb3b; max-width: 600px; }
+    #question-text { font-size: 18px; margin-bottom: 20px; color: #ffeb3b; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -67,24 +75,229 @@
     <canvas id="gameCanvas" width="800" height="400"></canvas>
   </div>
 
-  <!-- ZMĚNA: Vyskakovací okna přesunuta ven z herní plochy -->
-  <div id="overlay" class="modal" style="display: flex;">
-    <h2 id="overlayTitle">Clean Runner</h2>
-    <p id="overlayDesc">
-      <b>Na počítači:</b> Šipky NAHORU a DOLŮ.<br>
-      <b>Na mobilu:</b> Ťukni na horní nebo dolní polovinu obrazovky.<br><br>
-      🍌 Doplňuje energii.<br>
-      💊 Zrychlení, ale riziko dopingu!<br>
-      🚧 Kontrola WADA: Neutečeš. S dopingem tě zachrání jen správná odpověď.
-    </p>
-    <button id="startBtn">START ZÁVODU</button>
+  <!-- Startovací obrazovka -->
+  <div id="overlay" class="modal-overlay" style="display: flex;">
+    <div class="modal-content">
+      <h2 id="overlayTitle">Clean Runner</h2>
+      <p id="overlayDesc">
+        <b>Na PC:</b> Šipky NAHORU a DOLŮ.<br>
+        <b>Na mobilu:</b> Ťukni na horní nebo dolní polovinu herní plochy.<br><br>
+        🍌 Voda/Banán doplňuje energii.<br>
+        💊 Neznámá pilulka tě zrychlí, ale hrozí doping!<br>
+        🚧 Kontrola WADA: Neutečeš. S dopingem v krvi tě zachrání jen správná odpověď.
+      </p>
+      <button id="startBtn">START ZÁVODU</button>
+    </div>
   </div>
 
-  <div id="quiz-modal" class="modal">
-    <h2>🚨 DOPINGOVÁ KONTROLA! 🚨</h2>
-    <p>Pro záchranu kariéry odpověz správně:</p>
-    <div id="question-text">Zde bude otázka...</div>
-    <div id="answers-container"></div>
+  <!-- Kvízová obrazovka -->
+  <div id="quiz-modal" class="modal-overlay">
+    <div class="modal-content">
+      <h2>🚨 DOPINGOVÁ KONTROLA! 🚨</h2>
+      <p>Pro záchranu kariéry odpověz správně:</p>
+      <div id="question-text">Zde bude otázka...</div>
+      <div id="answers-container"></div>
+    </div>
   </div>
 
   <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const overlay = document.getElementById('overlay');
+    const overlayTitle = document.getElementById('overlayTitle');
+    const overlayDesc = document.getElementById('overlayDesc');
+    const startBtn = document.getElementById('startBtn');
+    
+    const quizModal = document.getElementById('quiz-modal');
+    const questionText = document.getElementById('question-text');
+    const answersContainer = document.getElementById('answers-container');
+
+    const distVal = document.getElementById('distVal');
+    const energyVal = document.getElementById('energyVal');
+    const dopingVal = document.getElementById('dopingVal');
+    const livesVal = document.getElementById('livesVal');
+
+    const questions = [
+      { q: "Kdo nese zodpovědnost za to, že je ve vzorku nalezena zakázaná látka?", options: ["Trenér a týmový doktor", "Sportovec (Princip striktní odpovědnosti)", "Výrobce doplňku stravy"], correct: 1 },
+      { q: "Můžeš odmítnout dopingovou kontrolu, pokud strašně spěcháš na letadlo?", options: ["Ano, pokud to doložíš letenkou", "Ne, hrozí za to stejný trest jako za doping", "Ano, test se jen odloží na další den"], correct: 1 },
+      { q: "Jsou běžné léky na chřipku (např. Modafen) při závodech povoleny?", options: ["Ne, obsahují pseudoefedrin", "Ano, léky z lékárny jsou vždy bezpečné", "Ano, ale nesmíš si vzít víc než dva"], correct: 0 },
+      { q: "Jaký je standardní zákaz činnosti (ban) za úmyslný doping?", options: ["1 rok", "2 roky", "4 roky"], correct: 2 },
+      { q: "Může ti podat lékař v rámci regenerace infuzi s vitamíny o objemu 200 ml?", options: ["Ne, infuze nad 100 ml za 12 hod. jsou zakázány", "Ano, vitamíny nejsou doping", "Ano, ale pouze v přítomnosti trenéra"], correct: 0 },
+      { q: "Je marihuana (THC) považována za doping?", options: ["Ne, jde o rekreační drogu", "Ano, při soutěži je zakázána", "Ano, ale jen v motoristických sportech"], correct: 1 },
+      { q: "Co je to TUE (Terapeutická výjimka)?", options: ["Povolení pro astmatiky nechodit na kontroly", "Legální možnost užívat zakázaný lék ze zdravotních důvodů", "Úplatek komisaři"], correct: 1 },
+      { q: "Zaručuje nápis '100% Přírodní' na doplňku, že neobsahuje doping?", options: ["Ano, přírodní látky WADA nezakazuje", "Ne, doplňky stravy bývají často kontaminované", "Ano, pokud je koupený v EU"], correct: 1 },
+      { q: "Je kofein aktuálně na seznamu zakázaných látek WADA?", options: ["Ano, je to silný stimulant", "Ne, ale je na tzv. monitorovacím programu", "Ano, ale jen pro sportovce pod 18 let"], correct: 1 },
+      { q: "Může být potrestán i trenér, který sportovci doping obstaral?", options: ["Ano, hrozí mu i doživotní zákaz činnosti", "Ne, pravidla WADA platí jen pro sportovce", "Ano, ale dostane jen pokutu"], correct: 0 }
+    ];
+
+    let isRunning = false;
+    let isQuizActive = false;
+    let score = 0; let energy = 100; let dopingLevel = 0; let speed = 5; let lives = 3;
+    
+    const lanes = [90, 200, 310];
+    let currentLane = 1;
+    const player = { x: 100, y: lanes[1], targetY: lanes[1], radius: 20 };
+    
+    let items = []; let wadaGate = null; let spawnTimer = 0; let gateTimer = 0;
+
+    // Klávesnice pro PC
+    window.addEventListener('keydown', (e) => {
+      if (!isRunning || isQuizActive) return;
+      if (e.key === 'ArrowUp' && currentLane > 0) {
+        currentLane--; player.targetY = lanes[currentLane];
+      } else if (e.key === 'ArrowDown' && currentLane < lanes.length - 1) {
+        currentLane++; player.targetY = lanes[currentLane];
+      }
+    });
+
+    // Dotykové ovládání pro herní plochu
+    canvas.addEventListener('touchstart', (e) => {
+      e.preventDefault(); // Zabrání rolování stránky při kliknutí na plátno
+      if (!isRunning || isQuizActive) return;
+      const rect = canvas.getBoundingClientRect();
+      const touchY = e.touches[0].clientY - rect.top;
+      
+      if (touchY < rect.height / 2 && currentLane > 0) {
+        currentLane--; player.targetY = lanes[currentLane];
+      } else if (touchY >= rect.height / 2 && currentLane < lanes.length - 1) {
+        currentLane++; player.targetY = lanes[currentLane];
+      }
+    }, { passive: false });
+
+    // START TLAČÍTKO - Nyní maximálně jednoduché a 100% spolehlivé
+    startBtn.onclick = function() {
+      if (isRunning) return; // Zabrání dvojitému spuštění
+      isRunning = true; isQuizActive = false;
+      score = 0; energy = 100; dopingLevel = 0; speed = 5; lives = 3;
+      currentLane = 1; player.y = lanes[1]; player.targetY = lanes[1];
+      items = []; wadaGate = null; spawnTimer = 0; gateTimer = 0;
+      
+      overlay.style.display = 'none'; quizModal.style.display = 'none';
+      updateUI(); requestAnimationFrame(gameLoop);
+    };
+
+    function gameOver(title, text) {
+      isRunning = false;
+      overlayTitle.innerText = title; overlayDesc.innerHTML = text;
+      startBtn.innerText = "Hrát znovu"; overlay.style.display = 'flex';
+    }
+
+    function updateUI() {
+      distVal.innerText = Math.floor(score);
+      energyVal.innerText = Math.max(0, Math.floor(energy));
+      dopingVal.innerText = Math.floor(dopingLevel);
+      livesVal.innerText = lives;
+    }
+
+    function triggerQuiz() {
+      isRunning = false; isQuizActive = true;
+      const qData = questions[Math.floor(Math.random() * questions.length)];
+      
+      questionText.innerText = qData.q;
+      answersContainer.innerHTML = '';
+      
+      qData.options.forEach((opt, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'quiz-btn'; btn.innerText = opt;
+        
+        // Zpracování odpovědi - jednoduchý spolehlivý proklik
+        btn.onclick = function() {
+          quizModal.style.display = 'none';
+          if (index === qData.correct) {
+            lives--; dopingLevel = 0; wadaGate = null; isQuizActive = false;
+            if (lives < 0) {
+               gameOver("🚨 VYČERPAL JSI ŠANCE!", "Správná odpověď, ale dopingoví komisaři už ti nevěří. Tvá kariéra končí.");
+            } else {
+               isRunning = true; requestAnimationFrame(gameLoop);
+            }
+          } else {
+            gameOver("🚨 POZITIVNÍ NÁLEZ!", `Špatná odpověď.<br><br><b>Správně bylo:</b> ${qData.options[qData.correct]}`);
+          }
+          updateUI();
+        };
+        
+        answersContainer.appendChild(btn);
+      });
+      quizModal.style.display = 'flex';
+    }
+
+    function spawnItem() {
+      const lane = Math.floor(Math.random() * 3);
+      items.push({ x: 850, y: lanes[lane], type: Math.random() < 0.6 ? 'clean' : 'dope' });
+    }
+
+    function update() {
+      player.y += (player.targetY - player.y) * 0.2; 
+      
+      energy -= 0.06;
+      if (dopingLevel > 0) dopingLevel -= 0.02; 
+      if (dopingLevel < 0) dopingLevel = 0;
+      
+      score += speed / 10; speed += 0.002; 
+
+      updateUI();
+
+      if (energy <= 0) {
+        gameOver("Vyčerpání!", `Došla ti energie! Nahrál jsi skóre: <b>${Math.floor(score)}</b>`); return;
+      }
+
+      spawnTimer++;
+      if (spawnTimer > 60 - speed*2) { spawnItem(); spawnTimer = 0; }
+
+      gateTimer++;
+      if (gateTimer > 500 && !wadaGate) { wadaGate = { x: 900 }; gateTimer = 0; }
+
+      if (wadaGate) {
+        wadaGate.x -= speed;
+        if (Math.abs(wadaGate.x - player.x) < 30) {
+          if (dopingLevel > 5) { triggerQuiz(); return; } 
+          else { energy = Math.min(100, energy + 20); wadaGate = null; }
+        } else if (wadaGate.x < -50) { wadaGate = null; }
+      }
+
+      for (let i = items.length - 1; i >= 0; i--) {
+        const item = items[i]; item.x -= speed;
+        if (Math.abs(item.x - player.x) < 35 && Math.abs(item.y - player.y) < 35) {
+          if (item.type === 'clean') { energy = Math.min(100, energy + 25); } 
+          else { energy = Math.min(100, energy + 40); dopingLevel += 50; }
+          items.splice(i, 1); continue;
+        }
+        if (item.x < -50) items.splice(i, 1);
+      }
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.strokeStyle = "rgba(255,255,255,0.2)";
+      ctx.lineWidth = 4; ctx.setLineDash([20, 15]);
+      ctx.beginPath();
+      ctx.moveTo(0, 145); ctx.lineTo(canvas.width, 145);
+      ctx.moveTo(0, 255); ctx.lineTo(canvas.width, 255);
+      ctx.stroke(); ctx.setLineDash([]);
+
+      if (wadaGate) {
+        ctx.fillStyle = "rgba(255, 0, 0, 0.4)"; ctx.fillRect(wadaGate.x - 20, 0, 40, canvas.height);
+        ctx.fillStyle = "#fff"; ctx.font = "20px sans-serif"; ctx.textAlign = "center";
+        ctx.fillText("🚧 WADA 🚧", wadaGate.x, canvas.height / 2);
+      }
+
+      ctx.beginPath(); ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
+      ctx.fillStyle = dopingLevel > 20 ? "#ff5722" : "#2196f3"; ctx.fill();
+      ctx.lineWidth = 3; ctx.strokeStyle = "#fff"; ctx.stroke();
+
+      ctx.font = "28px sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      for (let item of items) {
+        ctx.fillText(item.type === 'clean' ? "🍌" : "💊", item.x, item.y);
+      }
+    }
+
+    function gameLoop() {
+      if (isRunning && !isQuizActive) {
+        update(); draw(); requestAnimationFrame(gameLoop);
+      }
+    }
+  </script>
+</body>
+</html>
