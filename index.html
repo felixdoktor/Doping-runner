@@ -9,10 +9,10 @@
       margin: 0; background: #1a1a1a; color: #fff;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      min-height: 100vh; overflow: hidden; /* Zabrání nechtěnému scrollování na mobilu */
+      min-height: 100vh; overflow: hidden; 
+      touch-action: none; /* Zabrání nechtěnému posouvání a obnovování stránky na mobilu */
     }
     
-    /* Úprava pro mobilní zobrazení UI */
     #ui {
       display: flex; gap: 10px; margin-bottom: 10px; font-size: 16px; font-weight: bold;
       flex-wrap: wrap; justify-content: center; width: 95%; max-width: 800px;
@@ -23,38 +23,35 @@
     #danger-box { border-left-color: #f44336; }
     #lives-box { border-left-color: #ffeb3b; }
     
-    /* Kontejner hry se na mobilu přizpůsobí šířce */
     #game-container {
       position: relative; border: 4px solid #444; border-radius: 8px; overflow: hidden;
       width: 95%; max-width: 800px; aspect-ratio: 2 / 1;
     }
     
-    /* Samotné plátno se roztáhne přesně do kontejneru */
-    canvas { 
-      background: #2e7d32; display: block; width: 100%; height: 100%; 
-    }
+    canvas { background: #2e7d32; display: block; width: 100%; height: 100%; }
     
-    /* Vyskakovací okna (modaly) upraveny pro menší displeje */
+    /* ZMĚNA: Okna jsou teď fixní přes celou obrazovku (nic je neořízne) */
     .modal {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.9);
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.95);
       display: none; flex-direction: column; justify-content: center; align-items: center;
-      text-align: center; padding: 15px; box-sizing: border-box; z-index: 10;
+      text-align: center; padding: 20px; box-sizing: border-box; z-index: 1000;
     }
-    .modal h2 { margin-top: 0; font-size: 20px; }
-    .modal p { font-size: 14px; }
+    .modal h2 { margin-top: 0; font-size: 22px; color: #fff; }
+    .modal p { font-size: 15px; max-width: 600px; line-height: 1.5; }
     
     button {
-      background: #4caf50; color: white; border: none; padding: 12px 20px;
-      font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; margin: 5px;
+      background: #4caf50; color: white; border: none; padding: 15px 30px;
+      font-size: 18px; font-weight: bold; border-radius: 6px; cursor: pointer; margin: 15px;
     }
     button:hover { background: #45a049; }
+    button:active { transform: scale(0.95); } /* Efekt zmáčknutí */
     
     .quiz-btn {
-      background: #2196f3; width: 100%; max-width: 400px; padding: 10px; font-size: 14px;
+      background: #2196f3; width: 100%; max-width: 400px; padding: 12px; font-size: 15px; margin: 5px;
     }
     .quiz-btn:hover { background: #1976d2; }
-    #question-text { font-size: 18px; margin-bottom: 15px; color: #ffeb3b; }
+    #question-text { font-size: 18px; margin-bottom: 20px; color: #ffeb3b; max-width: 600px; }
   </style>
 </head>
 <body>
@@ -68,45 +65,26 @@
 
   <div id="game-container">
     <canvas id="gameCanvas" width="800" height="400"></canvas>
-    
-    <div id="overlay" class="modal" style="display: flex;">
-      <h2 id="overlayTitle">Clean Runner</h2>
-      <p id="overlayDesc">
-        <b>Na počítači:</b> Šipky NAHORU a DOLŮ.<br>
-        <b>Na mobilu:</b> Ťukni na horní nebo dolní polovinu obrazovky.<br><br>
-        🍌 Doplňuje energii.<br>
-        💊 Zrychlení, ale riziko dopingu!<br>
-        🚧 Kontrola WADA: Neutečeš. S dopingem v krvi tě zachrání jen správná odpověď. (Max 3 šance)
-      </p>
-      <button id="startBtn">START ZÁVODU</button>
-    </div>
+  </div>
 
-    <div id="quiz-modal" class="modal">
-      <h2>🚨 DOPINGOVÁ KONTROLA! 🚨</h2>
-      <p>Pro záchranu kariéry odpověz správně:</p>
-      <div id="question-text">Zde bude otázka...</div>
-      <div id="answers-container"></div>
-    </div>
+  <!-- ZMĚNA: Vyskakovací okna přesunuta ven z herní plochy -->
+  <div id="overlay" class="modal" style="display: flex;">
+    <h2 id="overlayTitle">Clean Runner</h2>
+    <p id="overlayDesc">
+      <b>Na počítači:</b> Šipky NAHORU a DOLŮ.<br>
+      <b>Na mobilu:</b> Ťukni na horní nebo dolní polovinu obrazovky.<br><br>
+      🍌 Doplňuje energii.<br>
+      💊 Zrychlení, ale riziko dopingu!<br>
+      🚧 Kontrola WADA: Neutečeš. S dopingem tě zachrání jen správná odpověď.
+    </p>
+    <button id="startBtn">START ZÁVODU</button>
+  </div>
+
+  <div id="quiz-modal" class="modal">
+    <h2>🚨 DOPINGOVÁ KONTROLA! 🚨</h2>
+    <p>Pro záchranu kariéry odpověz správně:</p>
+    <div id="question-text">Zde bude otázka...</div>
+    <div id="answers-container"></div>
   </div>
 
   <script>
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
-
-    const overlay = document.getElementById('overlay');
-    const overlayTitle = document.getElementById('overlayTitle');
-    const overlayDesc = document.getElementById('overlayDesc');
-    const startBtn = document.getElementById('startBtn');
-    
-    const quizModal = document.getElementById('quiz-modal');
-    const questionText = document.getElementById('question-text');
-    const answersContainer = document.getElementById('answers-container');
-
-    const distVal = document.getElementById('distVal');
-    const energyVal = document.getElementById('energyVal');
-    const dopingVal = document.getElementById('dopingVal');
-    const livesVal = document.getElementById('livesVal');
-
-    const questions = [
-      { q: "Kdo nese zodpovědnost za to, že je ve vzorku nalezena zakázaná látka?", options: ["Trenér a týmový doktor", "Sportovec (Princip striktní odpovědnosti)", "Výrobce doplňku stravy"], correct: 1 },
-      { q: "Můžeš odmítnout dopingovou kontrolu, pokud strašně sp
