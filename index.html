@@ -326,4 +326,131 @@
         if (isCorrect) { lives = Math.min(5, lives + 1); resTitle = "VÝBORNĚ"; resText = "+1 život od lékaře."; } 
         else { resTitle = "ŠKODA"; resText = `<b>Správná odpověď:</b> ${qData.options[correctIndex]}`; }
       } else if (type === 'lawyer') {
-        if (isCorrect) { dopingFrames = 0
+        if (isCorrect) { dopingFrames = 0; resTitle = "OČIŠTĚN"; resText = "Váš doping byl vymazán z krve!"; } 
+        else { resTitle = "ZAMÍTNUTO"; resText = `<b>Správná odpověď:</b> ${qData.options[correctIndex]}`; }
+      }
+
+      if (isFatal) {
+        document.getElementById('quiz-modal').style.display = 'none'; gameOver(resTitle, resText);
+      } else {
+        document.getElementById('question-text').innerHTML = `<span style="font-size: 22px; color: #000AFF;">${resTitle}</span><br><br>${resText}`;
+        const btn = document.createElement('button');
+        btn.className = 'action-btn'; btn.innerText = "POKRAČOVAT V ZÁVODU";
+        btn.onclick = function() {
+          document.getElementById('quiz-modal').style.display = 'none'; isQuizActive = false;
+          isRunning = true; updateUI(); requestAnimationFrame(gameLoop);
+        };
+        ansCont.appendChild(btn);
+      }
+    }
+
+    function spawnItem() {
+      const lane = Math.floor(Math.random() * 3); const rand = Math.random();
+      let type, imgObj;
+      if (rand < 0.55) { type = 'clean'; imgObj = images.clean[Math.floor(Math.random() * images.clean.length)]; } 
+      else if (rand < 0.85) {
+        const p = Math.random();
+        if (p < 0.60) { type = 'dope_blue'; imgObj = images.dope_blue; } 
+        else if (p < 0.90) { type = 'dope_red'; imgObj = images.dope_red; } 
+        else { type = 'dope_bad'; imgObj = images.dope_bad; }
+      } else if (rand < 0.925) { type = 'doctor'; imgObj = images.doctor; } 
+      else { type = 'lawyer'; imgObj = images.lawyer; }
+      
+      items.push({ x: lanes[lane], y: -50, type: type, img: imgObj });
+    }
+
+    function update() {
+      player.x += (player.targetX - player.x) * 0.2; 
+      energy -= 0.10; 
+      if (dopingFrames > 0) dopingFrames--; 
+      score += speed / 10; speed += 0.002; updateUI();
+      if (energy <= 0) { gameOver("VYČERPÁNÍ", `Došla vám energie. Váš výsledek: <b>${Math.floor(score)}</b>`); return; }
+
+      spawnTimer++; if (spawnTimer > 60 - speed*1.5) { spawnItem(); spawnTimer = 0; }
+      gateTimer++; if (gateTimer > 500 && !wadaGate) { wadaGate = { y: -100 }; gateTimer = 0; }
+
+      if (wadaGate) {
+        wadaGate.y += speed; 
+        if (Math.abs(wadaGate.y - player.y) < 30) {
+          if (dopingFrames > 0) { triggerQuiz('wada'); return; } else { energy = Math.min(100, energy + 25); wadaGate = null; }
+        } else if (wadaGate.y > canvas.height + 50) { wadaGate = null; }
+      }
+
+      for (let i = items.length - 1; i >= 0; i--) {
+        const item = items[i]; 
+        item.y += speed; 
+        
+        if (Math.abs(item.x - player.x) < 40 && Math.abs(item.y - player.y) < 40) {
+          if (item.type === 'clean') { energy = Math.min(100, energy + 12); } 
+          else if (item.type === 'dope_red') { energy = Math.min(100, energy + 45); dopingFrames = Math.min(maxDopingFrames, dopingFrames + 900); } 
+          else if (item.type === 'dope_blue') { energy = Math.min(100, energy + 20); dopingFrames = Math.min(maxDopingFrames, dopingFrames + 300); } 
+          else if (item.type === 'dope_bad') { energy -= 20; dopingFrames = Math.min(maxDopingFrames, dopingFrames + 600); } 
+          else if (item.type === 'doctor') { items.splice(i, 1); triggerQuiz('doctor'); return; } 
+          else if (item.type === 'lawyer') { items.splice(i, 1); triggerQuiz('lawyer'); return; }
+          items.splice(i, 1); continue;
+        }
+        if (item.y > canvas.height + 50) items.splice(i, 1); 
+      }
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.3)"; ctx.lineWidth = 4; ctx.setLineDash([20, 15]);
+      ctx.beginPath(); ctx.moveTo(180, 0); ctx.lineTo(180, canvas.height); ctx.moveTo(360, 0); ctx.lineTo(360, canvas.height);
+      ctx.stroke(); ctx.setLineDash([]);
+
+      if (wadaGate) {
+        ctx.fillStyle = '#000000'; ctx.fillRect(0, wadaGate.y - 20, canvas.width, 40);
+        ctx.fillStyle = '#FFFFFF'; ctx.font = "bold 20px Arial"; ctx.textAlign = "center";
+        ctx.fillText("KONTROLA WADA", canvas.width / 2, wadaGate.y + 7);
+      }
+      
+      ctx.beginPath(); ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
+      ctx.fillStyle = dopingFrames > 0 ? '#000000' : '#D7C08C'; ctx.fill();
+      ctx.lineWidth = 4; ctx.strokeStyle = '#FFFFFF'; ctx.stroke();
+
+      const imgSize = 46; 
+      for (let item of items) {
+        if (item.img && item.img.complete && item.img.naturalHeight !== 0) {
+          ctx.drawImage(item.img, item.x - imgSize/2, item.y - imgSize/2, imgSize, imgSize);
+        } else {
+          ctx.fillStyle = '#FFFFFF'; ctx.beginPath(); ctx.arc(item.x, item.y, imgSize/2, 0, Math.PI * 2); ctx.fill();
+        }
+      }
+    }
+
+    function gameLoop() { if (isRunning && !isQuizActive) { update(); draw(); requestAnimationFrame(gameLoop); } }
+
+    function showLeaderboard() {
+      document.getElementById('leaderboard-modal').style.display = 'flex';
+      const list = document.getElementById('leaderboard-list');
+      if (!db) { list.innerHTML = "<li>Není připojena databáze.</li>"; return; }
+      list.innerHTML = "<li>Načítám...</li>";
+      
+      const scoresRef = query(ref(db, 'scores'), orderByChild('score'), limitToLast(10));
+      onValue(scoresRef, (snapshot) => {
+        const data = []; snapshot.forEach((child) => { data.push(child.val()); });
+        data.sort((a,b) => b.score - a.score);
+        list.innerHTML = '';
+        if (data.length === 0) list.innerHTML = "<li>Zatím žádné záznamy.</li>";
+        else data.forEach((d, i) => {
+          list.innerHTML += `<li><span><b>${i+1}.</b> ${d.name.replace(/</g, "&lt;")}</span> <b>${d.score}</b></li>`;
+        });
+      });
+    }
+
+    document.getElementById('closeLeaderboardBtn').addEventListener('click', () => { 
+      document.getElementById('leaderboard-modal').style.display = 'none'; 
+    });
+
+    document.getElementById('teacher-reset').addEventListener('click', () => {
+      const pwd = prompt("Zadej heslo učitele pro vymazání žebříčku:");
+      if (pwd === TEACHER_PASSWORD) {
+         if (db) { remove(ref(db, 'scores')); alert("Žebříček byl vymazán."); }
+      } else if (pwd !== null) { alert("Špatné heslo!"); }
+    });
+
+  </script>
+</body>
+</html>
