@@ -146,14 +146,16 @@
     // IMPORT OTÁZEK Z EXTERNÍHO SOUBORU
     import { questions } from './questions.js';
 
-    // ----------------------------------------------------------------------
-    // ZDE VLOŽ SVŮJ KÓD Z FIREBASE (PŘEPIŠ TENTO BLOK)
-    // ----------------------------------------------------------------------
+    // TVŮJ AKTIVNÍ FIREBASE KÓD
     const firebaseConfig = {
-      // apiKey: "...",
-      // authDomain: "...",
-      // databaseURL: "...",
-      // projectId: "..."
+      apiKey: "AIzaSyDYXM5ioUkvXIKrgQVSjYxjacqn8vm2vBA",
+      authDomain: "clean-runner.firebaseapp.com",
+      databaseURL: "https://clean-runner-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "clean-runner",
+      storageBucket: "clean-runner.firebasestorage.app",
+      messagingSenderId: "442932430448",
+      appId: "1:442932430448:web:f259de83a0fe31218096b5",
+      measurementId: "G-KPGTJKB9P6"
     };
 
     const TEACHER_PASSWORD = "heslo"; 
@@ -170,16 +172,13 @@
     let questionPool = [];
 
     function getUniqueQuestion() {
-      // Pokud v balíčku nezbyla žádná otázka, znovu ho naplníme a zamícháme
       if (questionPool.length === 0) {
-        questionPool = [...questions]; // Vytvoříme kopii všech otázek
-        // Fisher-Yates zamíchání
+        questionPool = [...questions]; 
         for (let i = questionPool.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
           [questionPool[i], questionPool[j]] = [questionPool[j], questionPool[i]];
         }
       }
-      // Vezme z konce pole jednu otázku a vyřadí ji z balíčku
       return questionPool.pop();
     }
 
@@ -261,7 +260,6 @@
     function triggerQuiz(type) {
       isRunning = false; isQuizActive = true;
       
-      // Taháme unikátní otázku z balíčku
       const qData = getUniqueQuestion();
       
       const titleEl = document.getElementById('quiz-title');
