@@ -22,33 +22,31 @@
     h1 {
       color: var(--adv-blue); font-weight: bold; text-transform: uppercase;
       letter-spacing: 1px; margin-bottom: 10px; text-align: center;
+      font-size: 24px;
     }
 
     #ui {
-      display: flex; gap: 10px; margin-bottom: 15px; font-size: 16px; font-weight: bold;
-      flex-wrap: wrap; justify-content: center; width: 95%; max-width: 800px;
+      display: flex; gap: 8px; margin-bottom: 10px; font-size: 15px; font-weight: bold;
+      flex-wrap: wrap; justify-content: center; width: 95%; max-width: 600px;
     }
     
     .hud-box {
-      background: var(--adv-black); color: var(--adv-white); padding: 8px 14px; 
+      background: var(--adv-black); color: var(--adv-white); padding: 8px 12px; 
       border-radius: 4px; border-left: 6px solid var(--adv-blue);
     }
     #danger-box { border-left-color: var(--adv-gold); }
     #lives-box { border-left-color: var(--adv-white); border: 2px solid var(--adv-black); color: var(--adv-black); background: var(--adv-white); }
-    #leaderboardBtn { 
-      background: var(--adv-blue); color: white; border: none; padding: 8px 14px; 
-      border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 16px; transition: background 0.2s;
-    }
-    #leaderboardBtn:hover { background: var(--adv-black); }
     
+    /* Kontejner je nyní vertikální (Poměr stran 3:4) */
     #game-container {
       position: relative; border: 6px solid var(--adv-black); border-radius: 4px; 
-      overflow: hidden; width: 95%; max-width: 800px; aspect-ratio: 4 / 3;
+      overflow: hidden; width: 95%; max-width: 600px; aspect-ratio: 3 / 4;
       box-shadow: 0 10px 30px rgba(0,0,0,0.15);
     }
     
     canvas { background: var(--adv-blue); display: block; width: 100%; height: 100%; touch-action: none; }
     
+    /* Vyskakovací okna */
     .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 1000;
@@ -58,23 +56,28 @@
       padding: 25px; text-align: center; max-width: 90%; width: 550px; max-height: 90vh; overflow-y: auto;
       box-shadow: 0 0 20px rgba(0,0,0,0.5);
     }
-    .modal-content h2 { margin-top: 0; font-size: 26px; color: var(--adv-blue); font-weight: bold; }
-    .modal-content p { font-size: 15px; line-height: 1.6; color: var(--adv-black); }
+    .modal-content h2 { margin-top: 0; font-size: 24px; color: var(--adv-blue); font-weight: bold; }
+    .modal-content p { font-size: 14px; line-height: 1.5; color: var(--adv-black); margin-bottom: 20px; }
     
     button.action-btn {
-      background: var(--adv-blue); color: var(--adv-white); border: none; padding: 14px 30px;
-      font-size: 16px; font-weight: bold; border-radius: 30px; cursor: pointer; margin: 10px 5px;
+      background: var(--adv-blue); color: var(--adv-white); border: none; padding: 14px 20px;
+      font-size: 16px; font-weight: bold; border-radius: 30px; cursor: pointer; margin: 8px 5px;
       width: 100%; max-width: 300px; transition: background 0.2s;
     }
     button.action-btn:hover { background: var(--adv-black); }
     button.action-btn:active { transform: scale(0.97); }
     
+    /* Specifický styl pro tlačítko žebříčku v menu */
+    #startLeaderboardBtn { background: var(--adv-black); border: 2px solid var(--adv-gold); }
+    #startLeaderboardBtn:hover { background: #333; }
+    
     .quiz-btn {
       background: var(--adv-white); color: var(--adv-black); border: 2px solid var(--adv-blue);
-      width: 100%; padding: 12px; font-size: 15px; margin: 6px 0; border-radius: 8px; cursor: pointer;
+      width: 100%; padding: 12px; font-size: 14px; margin: 6px 0; border-radius: 8px; cursor: pointer;
     }
     .quiz-btn:hover { background: var(--adv-blue); color: var(--adv-white); }
     
+    #leaderboard-modal { z-index: 1010; /* Musí být nad hlavním menu */ }
     #leaderboard-list { list-style: none; padding: 0; text-align: left; max-width: 350px; margin: 20px auto; }
     #leaderboard-list li { padding: 12px 10px; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; font-size: 18px; }
     #leaderboard-list li:nth-child(1) { font-weight: bold; color: var(--adv-gold); font-size: 22px; }
@@ -92,19 +95,20 @@
     <div class="hud-box">Skóre: <span id="distVal">0</span></div>
     <div class="hud-box">⚡ <span id="energyVal">100</span>%</div>
     <div class="hud-box" id="danger-box">Doping: <span id="dopingVal">0</span>%</div>
-    <div class="hud-box" id="lives-box">Šance: <span id="livesVal">3</span>/5</div>
-    <button id="leaderboardBtn">🏆 Žebříček</button>
+    <div class="hud-box" id="lives-box">❤️: <span id="livesVal">3</span>/5</div>
   </div>
 
   <div id="game-container">
-    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <!-- Plátno je nyní na výšku (600x800) -->
+    <canvas id="gameCanvas" width="600" height="800"></canvas>
   </div>
 
+  <!-- Hlavní menu & Konec hry -->
   <div id="overlay" class="modal-overlay" style="display: flex;">
     <div class="modal-content">
       <h2 id="overlayTitle">Pravidla fair play</h2>
       <div id="overlayDesc" style="text-align: left; margin-bottom: 15px;">
-        <b>Ovládání:</b> Šipky NAHORU/DOLŮ (nebo ťuknutí na obrazovku).<br><br>
+        <b>Ovládání:</b> Dotyk LEVÉ nebo PRAVÉ poloviny obrazovky (Šipky na PC).<br><br>
         🍏 💧 <b>Čistá výživa:</b> +12 % energie.<br>
         💊 🔵 ⚫ <b>Doping:</b> Rychlá energie, ale drží se v krvi (🔴 až 15s)!<br>
         🩺 <b>Lékař:</b> Kvíz o +1 život (Max 5).<br>
@@ -119,9 +123,11 @@
       </div>
 
       <button class="action-btn" id="startBtn">ZAHÁJIT ZÁVOD</button>
+      <button class="action-btn" id="startLeaderboardBtn">🏆 TOP 10 ŽEBŘÍČEK</button>
     </div>
   </div>
 
+  <!-- Žebříček Modal -->
   <div id="leaderboard-modal" class="modal-overlay">
     <div class="modal-content">
       <h2>🏆 TOP 10 HRÁČŮ <span id="teacher-reset" style="cursor: pointer; font-size: 16px;" title="Reset pro učitele">⚙️</span></h2>
@@ -130,11 +136,12 @@
     </div>
   </div>
 
+  <!-- Kvízový Modal -->
   <div id="quiz-modal" class="modal-overlay">
     <div class="modal-content">
       <h2 id="quiz-title">DOPINGOVÁ KONTROLA</h2>
       <p id="quiz-desc">Ve vašem vzorku byly nalezeny zakázané látky.</p>
-      <div id="question-text" style="font-size: 18px; margin-bottom: 25px; font-weight: bold;">Otázka...</div>
+      <div id="question-text" style="font-size: 17px; margin-bottom: 25px; font-weight: bold;">Otázka...</div>
       <div id="answers-container"></div>
     </div>
   </div>
@@ -176,21 +183,18 @@
       lawyer: new Image()
     };
 
-    // Zde definujeme jména souborů, které musíš mít nahrané na GitHubu
     images.clean[0].src = 'clean1.png';
     images.clean[1].src = 'clean2.png';
     images.dope_red.src = 'dope_red.png';
     images.dope_blue.src = 'dope_blue.png';
-    images.dope_bad.src = 'dope_black.png'; // pojmenováno dope_black.png
+    images.dope_bad.src = 'dope_black.png'; 
     images.doctor.src = 'doctor.png';
     images.lawyer.src = 'lawyer.png';
-
 
     // ----------------------------------------------------------------------
     // LOGIKA PRO NEOPAKUJÍCÍ SE OTÁZKY
     // ----------------------------------------------------------------------
     let questionPool = [];
-
     function getUniqueQuestion() {
       if (questionPool.length === 0) {
         questionPool = [...questions]; 
@@ -203,7 +207,7 @@
     }
 
     // ----------------------------------------------------------------------
-    // HERNÍ LOGIKA
+    // HERNÍ LOGIKA (VERTIKÁLNÍ SCROLLOVÁNÍ)
     // ----------------------------------------------------------------------
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
@@ -212,47 +216,61 @@
     const overlayDesc = document.getElementById('overlayDesc');
     const nameInputContainer = document.getElementById('name-input-container');
     const startBtn = document.getElementById('startBtn');
+    const startLeaderboardBtn = document.getElementById('startLeaderboardBtn');
     const saveScoreBtn = document.getElementById('saveScoreBtn');
     const skipScoreBtn = document.getElementById('skipScoreBtn');
 
     let isRunning = false; let isQuizActive = false;
-    let score = 0; let energy = 100; let speed = 5; let lives = 3;
+    let score = 0; let energy = 100; let speed = 6; let lives = 3;
     let dopingFrames = 0; const maxDopingFrames = 900; 
     
-    const lanes = [120, 300, 480]; let currentLane = 1;
-    const player = { x: 120, y: lanes[1], targetY: lanes[1], radius: 24 };
+    // Tři vertikální dráhy (X souřadnice v plátnu širokém 600px)
+    const lanes = [100, 300, 500]; let currentLane = 1;
+    // Hráč je usazen dole (Y = 700 z 800)
+    const player = { x: lanes[1], targetX: lanes[1], y: 700, radius: 24 };
     let items = []; let wadaGate = null; let spawnTimer = 0; let gateTimer = 0;
 
+    // OVLÁDÁNÍ
     window.addEventListener('keydown', (e) => {
       if (!isRunning || isQuizActive) return;
-      if (e.key === 'ArrowUp' && currentLane > 0) { currentLane--; player.targetY = lanes[currentLane]; } 
-      else if (e.key === 'ArrowDown' && currentLane < lanes.length - 1) { currentLane++; player.targetY = lanes[currentLane]; }
+      if (e.key === 'ArrowLeft' && currentLane > 0) { currentLane--; player.targetX = lanes[currentLane]; } 
+      else if (e.key === 'ArrowRight' && currentLane < lanes.length - 1) { currentLane++; player.targetX = lanes[currentLane]; }
     });
+    
     canvas.addEventListener('touchstart', (e) => {
       e.preventDefault(); if (!isRunning || isQuizActive) return;
-      const rect = canvas.getBoundingClientRect(); const touchY = e.touches[0].clientY - rect.top;
-      if (touchY < rect.height / 2 && currentLane > 0) { currentLane--; player.targetY = lanes[currentLane]; } 
-      else if (touchY >= rect.height / 2 && currentLane < lanes.length - 1) { currentLane++; player.targetY = lanes[currentLane]; }
+      const rect = canvas.getBoundingClientRect(); const touchX = e.touches[0].clientX - rect.left;
+      // Dotyk levé poloviny = doleva, pravé = doprava
+      if (touchX < rect.width / 2 && currentLane > 0) { currentLane--; player.targetX = lanes[currentLane]; } 
+      else if (touchX >= rect.width / 2 && currentLane < lanes.length - 1) { currentLane++; player.targetX = lanes[currentLane]; }
     }, { passive: false });
 
+    // TLAČÍTKA START A ŽEBŘÍČEK
     startBtn.addEventListener('click', () => {
       isRunning = true; isQuizActive = false;
       score = 0; energy = 100; dopingFrames = 0; speed = 6; lives = 3; currentLane = 1; 
-      player.y = lanes[1]; player.targetY = lanes[1]; items = []; wadaGate = null;
+      player.x = lanes[1]; player.targetX = lanes[1]; items = []; wadaGate = null; spawnTimer = 0; gateTimer = 0;
       overlay.style.display = 'none'; document.getElementById('quiz-modal').style.display = 'none';
       updateUI(); requestAnimationFrame(gameLoop);
     });
 
+    startLeaderboardBtn.addEventListener('click', showLeaderboard);
+
+    // KONEC HRY
     function gameOver(title, text) {
       isRunning = false;
       overlayTitle.innerText = title; overlayDesc.innerHTML = text;
-      nameInputContainer.style.display = 'none'; startBtn.style.display = 'block'; startBtn.innerText = "HRÁT ZNOVU";
+      nameInputContainer.style.display = 'none'; 
+      startBtn.style.display = 'inline-block'; startBtn.innerText = "HRÁT ZNOVU";
+      startLeaderboardBtn.style.display = 'inline-block';
       
       if (Math.floor(score) > 0) {
         if (!db) {
           overlayDesc.innerHTML += "<br><br><i>(Žebříček není aktivní, učitel nenastavil online databázi)</i>";
         } else {
-          nameInputContainer.style.display = 'block'; startBtn.style.display = 'none';
+          nameInputContainer.style.display = 'block'; 
+          startBtn.style.display = 'none'; 
+          startLeaderboardBtn.style.display = 'none';
         }
       }
       overlay.style.display = 'flex';
@@ -262,12 +280,17 @@
       const name = document.getElementById('playerName').value.trim();
       if (name && db) {
         push(ref(db, 'scores'), { name: name, score: Math.floor(score), time: Date.now() });
-        nameInputContainer.style.display = 'none'; startBtn.style.display = 'block'; showLeaderboard();
+        nameInputContainer.style.display = 'none'; 
+        startBtn.style.display = 'inline-block'; 
+        startLeaderboardBtn.style.display = 'inline-block'; 
+        showLeaderboard();
       }
     });
 
     skipScoreBtn.addEventListener('click', () => {
-      nameInputContainer.style.display = 'none'; startBtn.style.display = 'block';
+      nameInputContainer.style.display = 'none'; 
+      startBtn.style.display = 'inline-block'; 
+      startLeaderboardBtn.style.display = 'inline-block';
     });
 
     function updateUI() {
@@ -277,13 +300,12 @@
       document.getElementById('livesVal').innerText = lives;
     }
 
+    // KVÍZY
     function triggerQuiz(type) {
       isRunning = false; isQuizActive = true;
-      
       const qData = getUniqueQuestion();
       
-      const titleEl = document.getElementById('quiz-title');
-      const descEl = document.getElementById('quiz-desc');
+      const titleEl = document.getElementById('quiz-title'); const descEl = document.getElementById('quiz-desc');
       if (type === 'wada') {
         titleEl.innerText = "DOPINGOVÁ KONTROLA"; descEl.innerText = "Ve vašem vzorku byly nalezeny zakázané látky. Prokážete znalost pravidel?";
       } else if (type === 'doctor') {
@@ -341,44 +363,48 @@
       }
     }
 
+    // SPÁWNOVÁNÍ PŘEKÁŽEK (Padají shora Y = -50)
     function spawnItem() {
       const lane = Math.floor(Math.random() * 3); const rand = Math.random();
       let type, imgObj;
-      
-      if (rand < 0.55) { 
-        type = 'clean'; 
-        imgObj = images.clean[Math.floor(Math.random() * images.clean.length)]; 
-      } 
+      if (rand < 0.55) { type = 'clean'; imgObj = images.clean[Math.floor(Math.random() * images.clean.length)]; } 
       else if (rand < 0.85) {
         const p = Math.random();
         if (p < 0.60) { type = 'dope_blue'; imgObj = images.dope_blue; } 
         else if (p < 0.90) { type = 'dope_red'; imgObj = images.dope_red; } 
         else { type = 'dope_bad'; imgObj = images.dope_bad; }
-      } 
-      else if (rand < 0.925) { type = 'doctor'; imgObj = images.doctor; } 
+      } else if (rand < 0.925) { type = 'doctor'; imgObj = images.doctor; } 
       else { type = 'lawyer'; imgObj = images.lawyer; }
       
-      items.push({ x: canvas.width + 50, y: lanes[lane], type: type, img: imgObj });
+      // X = dráha, Y = -50 (nad horním okrajem plátna)
+      items.push({ x: lanes[lane], y: -50, type: type, img: imgObj });
     }
 
+    // AKTUALIZACE STAVU
     function update() {
-      player.y += (player.targetY - player.y) * 0.2; energy -= 0.10; 
+      // Hráč plynule klouže do stran (X osa)
+      player.x += (player.targetX - player.x) * 0.2; 
+      
+      energy -= 0.10; 
       if (dopingFrames > 0) dopingFrames--; 
       score += speed / 10; speed += 0.002; updateUI();
       if (energy <= 0) { gameOver("VYČERPÁNÍ", `Došla vám energie. Váš výsledek: <b>${Math.floor(score)}</b>`); return; }
 
       spawnTimer++; if (spawnTimer > 60 - speed*1.5) { spawnItem(); spawnTimer = 0; }
-      gateTimer++; if (gateTimer > 500 && !wadaGate) { wadaGate = { x: canvas.width + 100 }; gateTimer = 0; }
+      // WADA Zátaras nyní padá shora (Y = -100)
+      gateTimer++; if (gateTimer > 500 && !wadaGate) { wadaGate = { y: -100 }; gateTimer = 0; }
 
       if (wadaGate) {
-        wadaGate.x -= speed;
-        if (Math.abs(wadaGate.x - player.x) < 30) {
+        wadaGate.y += speed; // Bariéra se posouvá dolů
+        if (Math.abs(wadaGate.y - player.y) < 30) {
           if (dopingFrames > 0) { triggerQuiz('wada'); return; } else { energy = Math.min(100, energy + 25); wadaGate = null; }
-        } else if (wadaGate.x < -50) { wadaGate = null; }
+        } else if (wadaGate.y > canvas.height + 50) { wadaGate = null; }
       }
 
       for (let i = items.length - 1; i >= 0; i--) {
-        const item = items[i]; item.x -= speed;
+        const item = items[i]; 
+        item.y += speed; // Předměty padají shora dolů
+        
         if (Math.abs(item.x - player.x) < 40 && Math.abs(item.y - player.y) < 40) {
           if (item.type === 'clean') { energy = Math.min(100, energy + 12); } 
           else if (item.type === 'dope_red') { energy = Math.min(100, energy + 45); dopingFrames = Math.min(maxDopingFrames, dopingFrames + 900); } 
@@ -388,41 +414,45 @@
           else if (item.type === 'lawyer') { items.splice(i, 1); triggerQuiz('lawyer'); return; }
           items.splice(i, 1); continue;
         }
-        if (item.x < -50) items.splice(i, 1);
+        if (item.y > canvas.height + 50) items.splice(i, 1); // Odstranění předmětů co opustily spodek plátna
       }
     }
 
+    // VYKRESLOVÁNÍ
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // Svislé pruhy (rozdělující 3 dráhy)
       ctx.strokeStyle = "rgba(255, 255, 255, 0.3)"; ctx.lineWidth = 4; ctx.setLineDash([20, 15]);
-      ctx.beginPath(); ctx.moveTo(0, 210); ctx.lineTo(canvas.width, 210); ctx.moveTo(0, 390); ctx.lineTo(canvas.width, 390);
+      ctx.beginPath(); ctx.moveTo(200, 0); ctx.lineTo(200, canvas.height); ctx.moveTo(400, 0); ctx.lineTo(400, canvas.height);
       ctx.stroke(); ctx.setLineDash([]);
 
+      // WADA Bariéra padající shora (šířka přes celé plátno)
       if (wadaGate) {
-        ctx.fillStyle = '#000000'; ctx.fillRect(wadaGate.x - 20, 0, 40, canvas.height);
+        ctx.fillStyle = '#000000'; ctx.fillRect(0, wadaGate.y - 20, canvas.width, 40);
         ctx.fillStyle = '#FFFFFF'; ctx.font = "bold 20px Arial"; ctx.textAlign = "center";
-        ctx.fillText("KONTROLA", wadaGate.x, canvas.height / 2 - 15); ctx.fillText("WADA", wadaGate.x, canvas.height / 2 + 15);
+        ctx.fillText("KONTROLA WADA", canvas.width / 2, wadaGate.y + 7);
       }
+      
+      // Hráč
       ctx.beginPath(); ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
       ctx.fillStyle = dopingFrames > 0 ? '#000000' : '#D7C08C'; ctx.fill();
       ctx.lineWidth = 4; ctx.strokeStyle = '#FFFFFF'; ctx.stroke();
 
-      // VYKRESLENÍ VLASTNÍCH OBRÁZKŮ MÍSTO EMOJI
-      const imgSize = 46; // Velikost obrázků na plátně v pixelech
+      // Předměty (Vykreslení obrázků)
+      const imgSize = 46; 
       for (let item of items) {
         if (item.img && item.img.complete && item.img.naturalHeight !== 0) {
-          // Vykreslí načtený obrázek
           ctx.drawImage(item.img, item.x - imgSize/2, item.y - imgSize/2, imgSize, imgSize);
         } else {
-          // Pojistka: Pokud se obrázek nestihne načíst, nakreslí bílé zástupné kolečko
-          ctx.fillStyle = '#FFFFFF';
-          ctx.beginPath(); ctx.arc(item.x, item.y, imgSize/2, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = '#FFFFFF'; ctx.beginPath(); ctx.arc(item.x, item.y, imgSize/2, 0, Math.PI * 2); ctx.fill();
         }
       }
     }
 
     function gameLoop() { if (isRunning && !isQuizActive) { update(); draw(); requestAnimationFrame(gameLoop); } }
 
+    // ŽEBŘÍČEK
     function showLeaderboard() {
       document.getElementById('leaderboard-modal').style.display = 'flex';
       const list = document.getElementById('leaderboard-list');
@@ -441,8 +471,9 @@
       });
     }
 
-    document.getElementById('leaderboardBtn').addEventListener('click', showLeaderboard);
-    document.getElementById('closeLeaderboardBtn').addEventListener('click', () => { document.getElementById('leaderboard-modal').style.display = 'none'; });
+    document.getElementById('closeLeaderboardBtn').addEventListener('click', () => { 
+      document.getElementById('leaderboard-modal').style.display = 'none'; 
+    });
 
     document.getElementById('teacher-reset').addEventListener('click', () => {
       const pwd = prompt("Zadej heslo učitele pro vymazání žebříčku:");
