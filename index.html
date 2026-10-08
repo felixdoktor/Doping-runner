@@ -105,7 +105,7 @@
       <h2 id="overlayTitle">Pravidla fair play</h2>
       <div id="overlayDesc" style="text-align: left; margin-bottom: 15px;">
         <b>Ovládání:</b> Šipky NAHORU/DOLŮ (nebo ťuknutí na obrazovku).<br><br>
-        🍌 💧 <b>Čistá výživa:</b> +12 % energie.<br>
+        🍏 💧 <b>Čistá výživa:</b> +12 % energie.<br>
         💊 🔵 ⚫ <b>Doping:</b> Rychlá energie, ale drží se v krvi (🔴 až 15s)!<br>
         🩺 <b>Lékař:</b> Kvíz o +1 život (Max 5).<br>
         💼 <b>Právník:</b> Kvíz o smazání dopingu z krve.<br>
@@ -142,11 +142,9 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getDatabase, ref, push, onValue, remove, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-    
-    // IMPORT OTÁZEK Z EXTERNÍHO SOUBORU
     import { questions } from './questions.js';
 
-    // TVŮJ AKTIVNÍ FIREBASE KÓD
+    // FIREBASE NASTAVENÍ
     const firebaseConfig = {
       apiKey: "AIzaSyDYXM5ioUkvXIKrgQVSjYxjacqn8vm2vBA",
       authDomain: "clean-runner.firebaseapp.com",
@@ -167,7 +165,29 @@
     }
 
     // ----------------------------------------------------------------------
-    // LOGIKA PRO NEOPAKUJÍCÍ SE OTÁZKY (ZAMÍCHANÝ BALÍČEK)
+    // NAČÍTÁNÍ OBRÁZKŮ PŘEKÁŽEK
+    // ----------------------------------------------------------------------
+    const images = {
+      clean: [new Image(), new Image()],
+      dope_red: new Image(),
+      dope_blue: new Image(),
+      dope_bad: new Image(),
+      doctor: new Image(),
+      lawyer: new Image()
+    };
+
+    // Zde definujeme jména souborů, které musíš mít nahrané na GitHubu
+    images.clean[0].src = 'clean1.png';
+    images.clean[1].src = 'clean2.png';
+    images.dope_red.src = 'dope_red.png';
+    images.dope_blue.src = 'dope_blue.png';
+    images.dope_bad.src = 'dope_black.png'; // pojmenováno dope_black.png
+    images.doctor.src = 'doctor.png';
+    images.lawyer.src = 'lawyer.png';
+
+
+    // ----------------------------------------------------------------------
+    // LOGIKA PRO NEOPAKUJÍCÍ SE OTÁZKY
     // ----------------------------------------------------------------------
     let questionPool = [];
 
@@ -323,13 +343,22 @@
 
     function spawnItem() {
       const lane = Math.floor(Math.random() * 3); const rand = Math.random();
-      let type, emoji;
-      if (rand < 0.55) { type = 'clean'; emoji = ['🍌', '💧', '🍎', '🥪'][Math.floor(Math.random() * 4)]; } 
+      let type, imgObj;
+      
+      if (rand < 0.55) { 
+        type = 'clean'; 
+        imgObj = images.clean[Math.floor(Math.random() * images.clean.length)]; 
+      } 
       else if (rand < 0.85) {
         const p = Math.random();
-        if (p < 0.60) { type = 'dope_blue'; emoji = '🔵'; } else if (p < 0.90) { type = 'dope_red'; emoji = '💊'; } else { type = 'dope_bad'; emoji = '⚫'; }
-      } else if (rand < 0.925) { type = 'doctor'; emoji = '🩺'; } else { type = 'lawyer'; emoji = '💼'; }
-      items.push({ x: canvas.width + 50, y: lanes[lane], type: type, emoji: emoji });
+        if (p < 0.60) { type = 'dope_blue'; imgObj = images.dope_blue; } 
+        else if (p < 0.90) { type = 'dope_red'; imgObj = images.dope_red; } 
+        else { type = 'dope_bad'; imgObj = images.dope_bad; }
+      } 
+      else if (rand < 0.925) { type = 'doctor'; imgObj = images.doctor; } 
+      else { type = 'lawyer'; imgObj = images.lawyer; }
+      
+      items.push({ x: canvas.width + 50, y: lanes[lane], type: type, img: imgObj });
     }
 
     function update() {
@@ -378,8 +407,18 @@
       ctx.fillStyle = dopingFrames > 0 ? '#000000' : '#D7C08C'; ctx.fill();
       ctx.lineWidth = 4; ctx.strokeStyle = '#FFFFFF'; ctx.stroke();
 
-      ctx.font = "38px Arial"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-      for (let item of items) ctx.fillText(item.emoji, item.x, item.y);
+      // VYKRESLENÍ VLASTNÍCH OBRÁZKŮ MÍSTO EMOJI
+      const imgSize = 46; // Velikost obrázků na plátně v pixelech
+      for (let item of items) {
+        if (item.img && item.img.complete && item.img.naturalHeight !== 0) {
+          // Vykreslí načtený obrázek
+          ctx.drawImage(item.img, item.x - imgSize/2, item.y - imgSize/2, imgSize, imgSize);
+        } else {
+          // Pojistka: Pokud se obrázek nestihne načíst, nakreslí bílé zástupné kolečko
+          ctx.fillStyle = '#FFFFFF';
+          ctx.beginPath(); ctx.arc(item.x, item.y, imgSize/2, 0, Math.PI * 2); ctx.fill();
+        }
+      }
     }
 
     function gameLoop() { if (isRunning && !isQuizActive) { update(); draw(); requestAnimationFrame(gameLoop); } }
