@@ -255,7 +255,6 @@
       catch (e) { console.error("Chyba databáze:", e); }
     }
 
-    // Načtení herních obrázků včetně 6 modulárních částí pozadí
     const images = {
       clean: [new Image(), new Image()],
       dope_red: new Image(),
@@ -281,7 +280,6 @@
     images.lawyer.src = 'lawyer.png';
     images.tue.src = 'tue.png'; 
 
-    // Přiřazení souborů k modulárním pozadím
     images.bgCity.src = 'sector_city.png';
     images.bgCityToForest.src = 'trans_city_to_forest.png';
     images.bgForest.src = 'sector_forest.png';
@@ -360,7 +358,7 @@
     let warningText = "";
     let warningTimer = 0;
 
-    const lanes = [110, 270, 430]; 
+    const lanes = [210, 270, 330]; 
     let currentLane = 1;
     const player = { x: lanes[1], targetX: lanes[1], y: 820, radius: 26 };
     
@@ -723,35 +721,32 @@
       }
     }
 
-    // Funkce pro výběr aktuálního modulárního pozadí podle skóre (Loop trasy)
     function getModularBackground(currentScore) {
-      // Celková délka jednoho kompletního okruhu trasy v metrech
       const loopLength = 9000; 
       let pos = currentScore % loopLength;
 
-      // Rozdělení 9000 metrů na 6 bloků (3 sektory + 3 přechody)
       if (pos < 2000) {
-        return { img: images.bgCity, progress: pos / 2000 };
+        return { img: images.bgCity, progress: pos / 2000, flip: false };
       } else if (pos < 2500) {
-        return { img: images.bgCityToForest, progress: (pos - 2000) / 500 };
+        return { img: images.bgCityToForest, progress: (pos - 2000) / 500, flip: true }; // Otočeno o 180°
       } else if (pos < 4500) {
-        return { img: images.bgForest, progress: (pos - 2500) / 2000 };
+        return { img: images.bgForest, progress: (pos - 2500) / 2000, flip: false };
       } else if (pos < 5000) {
-        return { img: images.bgForestToStadium, progress: (pos - 4500) / 500 };
+        return { img: images.bgForestToStadium, progress: (pos - 4500) / 500, flip: true }; // Otočeno o 180°
       } else if (pos < 7000) {
-        return { img: images.bgStadium, progress: (pos - 5000) / 2000 };
+        return { img: images.bgStadium, progress: (pos - 5000) / 2000, flip: false };
       } else {
-        return { img: images.bgStadiumToCity, progress: (pos - 7000) / 2000 };
+        return { img: images.bgStadiumToCity, progress: (pos - 7000) / 2000, flip: true }; // Otočeno o 180°
       }
     }
 
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      // Vykreslení modálního pozadí z 6 nahraných obrázků
       let bgData = getModularBackground(score);
       let bgImg = bgData.img;
       let progress = bgData.progress;
+      let flip = bgData.flip;
 
       if (bgImg && bgImg.complete && bgImg.naturalHeight > 0) {
         let imgH = bgImg.naturalHeight;
@@ -762,26 +757,33 @@
         
         let sourceY = progress * maxSourceY;
 
+        ctx.save();
+        if (flip) {
+          // Pokud je přechod obrácený, otočíme ho v plátně vzhůru nohama
+          ctx.translate(canvas.width, canvas.height);
+          ctx.rotate(Math.PI);
+          // Přepočítáme sourceY pro obrácené vykreslení
+          sourceY = maxSourceY - sourceY;
+        }
+
         ctx.drawImage(bgImg, 
           0, sourceY, imgW, visibleH, 
           0, 0, canvas.width, canvas.height
         );
+        ctx.restore();
       } else {
-        // Fallback, pokud se obrázek ještě načítá
         ctx.fillStyle = '#2c2c3e';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
       }
 
-      // WADA Brána
       if (wadaGate) {
         ctx.fillStyle = '#000000'; 
-        ctx.fillRect(60, wadaGate.y - 25, canvas.width - 120, 50);
+        ctx.fillRect(170, wadaGate.y - 25, 200, 50);
         ctx.fillStyle = '#FFFFFF'; 
-        ctx.font = "bold 22px Arial"; ctx.textAlign = "center";
+        ctx.font = "bold 18px Arial"; ctx.textAlign = "center";
         ctx.fillText("🚧 KONTROLA WADA 🚧", canvas.width / 2, wadaGate.y + 8);
       }
       
-      // Vykreslení předmětů
       const imgSize = 48; 
       for (let item of items) {
         const itemX = lanes[item.lane];
@@ -793,7 +795,6 @@
         }
       }
 
-      // Animovaný hráč
       const targetX = lanes[currentLane];
       player.x += (targetX - player.x) * 0.2; 
 
@@ -824,7 +825,6 @@
       ctx.moveTo(player.x + 10, player.y - 10); ctx.lineTo(player.x + 15 + armOffset, player.y + 2);
       ctx.stroke();
 
-      // Varovná hláška na obrazovce
       if (warningTimer > 0) {
         ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
         ctx.fillRect(30, 80, canvas.width - 60, 55);
