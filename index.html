@@ -68,11 +68,77 @@
     #startLeaderboardBtn { background: var(--adv-black); border: 2px solid var(--adv-gold); }
     #startLeaderboardBtn:hover { background: #333; }
     
-    .quiz-btn {
-      background: var(--adv-white); color: var(--adv-black); border: 2px solid var(--adv-blue);
-      width: 100%; padding: 12px; font-size: 14px; margin: 6px 0; border-radius: 8px; cursor: pointer;
+    /* STYL RUNEKSPEAKÉ CUTSCÉNY (DIALOGOVÉ OKNO) */
+    .rs-dialogue-box {
+      background: #0d0d1a;
+      border: 4px solid var(--adv-gold);
+      border-radius: 12px;
+      padding: 20px;
+      width: 92%;
+      max-width: 540px;
+      box-shadow: 0 0 40px rgba(0,0,0,0.9);
+      text-align: left;
     }
-    .quiz-btn:hover { background: var(--adv-blue); color: var(--adv-white); }
+    .rs-header {
+      color: var(--adv-gold);
+      font-weight: bold;
+      font-size: 16px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      border-bottom: 2px solid #222;
+      padding-bottom: 6px;
+      letter-spacing: 1px;
+    }
+    .rs-content-row {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .rs-portrait {
+      width: 80px;
+      height: 80px;
+      background: #1a1a2e;
+      border: 3px solid var(--adv-gold);
+      border-radius: 6px;
+      flex-shrink: 0;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .rs-portrait canvas {
+      width: 100%;
+      height: 100%;
+      image-rendering: pixelated; /* Zachová ostrý pixelový vzhled */
+    }
+    .rs-question {
+      color: var(--adv-white);
+      font-size: 15px;
+      line-height: 1.4;
+      font-weight: bold;
+    }
+    .rs-answers {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .quiz-btn {
+      background: #1a1a2e;
+      color: var(--adv-white);
+      border: 2px solid var(--adv-blue);
+      width: 100%;
+      padding: 12px 15px;
+      text-align: left;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .quiz-btn:hover {
+      background: var(--adv-blue);
+      border-color: var(--adv-gold);
+    }
     
     #leaderboard-modal { z-index: 1010; }
     #leaderboard-list { list-style: none; padding: 0; text-align: left; max-width: 350px; margin: 20px auto; }
@@ -99,16 +165,17 @@
     <canvas id="gameCanvas" width="540" height="960"></canvas>
   </div>
 
+  <!-- Úvodní / Koncová obrazovka -->
   <div id="overlay" class="modal-overlay" style="display: flex;">
     <div class="modal-content">
       <h2 id="overlayTitle">Pravidla fair play</h2>
       <div id="overlayDesc" style="text-align: left; margin-bottom: 15px;">
-        <b>Ovládání:</b> Přejetí prstem (swipe) doleva nebo doprava po obrazovce (Šipky na PC).<br><br>
+        <b>Ovládání:</b> Přejetí prstem (swipe) doleva nebo doprava (Šipky na PC).<br><br>
         🍏 💧 <b>Čistá výživa:</b> +12 % energie.<br>
         💊 🔵 ⚫ <b>Doping:</b> Rychlá energie, ale drží se v krvi (🔴 až 15s)!<br>
-        🩺 <b>Lékař:</b> Kvíz o +1 život (Max 5).<br>
-        💼 <b>Právník:</b> Kvíz o smazání dopingu z krve.<br>
-        🚧 <b>Kontrola WADA:</b> Máš-li doping, zachrání tě jen znalost pravidel!
+        🩺 <b>Lékař:</b> Retro cutscéna o +1 život (Max 5).<br>
+        💼 <b>Právník:</b> Cutscéna s Panem Exnerem o smazání dopingu.<br>
+        🚧 <b>Kontrola WADA:</b> Kvízová cutscéna. Zachrání tě jen znalost pravidel!
       </div>
       
       <div id="name-input-container" style="display: none;">
@@ -122,6 +189,7 @@
     </div>
   </div>
 
+  <!-- Žebříček -->
   <div id="leaderboard-modal" class="modal-overlay">
     <div class="modal-content">
       <h2>🏆 TOP 10 HRÁČŮ <span id="teacher-reset" style="cursor: pointer; font-size: 16px;" title="Reset pro učitele">⚙️</span></h2>
@@ -130,12 +198,18 @@
     </div>
   </div>
 
+  <!-- RUNEESCAPE CUTSCÉNA / DIALOGOVÉ OKNO -->
   <div id="quiz-modal" class="modal-overlay">
-    <div class="modal-content">
-      <h2 id="quiz-title">DOPINGOVÁ KONTROLA</h2>
-      <p id="quiz-desc">Ve vašem vzorku byly nalezeny zakázané látky.</p>
-      <div id="question-text" style="font-size: 17px; margin-bottom: 25px; font-weight: bold;">Otázka...</div>
-      <div id="answers-container"></div>
+    <div class="rs-dialogue-box">
+      <div id="quiz-title" class="rs-header">DOPINGOVÁ KONTROLA WADA</div>
+      <div class="rs-content-row">
+        <div class="rs-portrait">
+          <!-- Canvas pro vykreslení pixelartové cutscény -->
+          <canvas id="pixelPortrait" width="32" height="32"></canvas>
+        </div>
+        <div id="question-text" class="rs-question">Otázka...</div>
+      </div>
+      <div id="answers-container" class="rs-answers"></div>
     </div>
   </div>
 
@@ -180,6 +254,40 @@
     images.doctor.src = 'doctor.png';
     images.lawyer.src = 'lawyer.png';
 
+    // FUNKCE PRO PIXEL-ART CUTSCÉNU (Vykreslí retro obličej postavy)
+    function drawPixelAvatar(type) {
+      const pCanvas = document.getElementById('pixelPortrait');
+      const pCtx = pCanvas.getContext('2d');
+      pCtx.imageSmoothingEnabled = false;
+      pCtx.clearRect(0, 0, 32, 32);
+
+      // Pozadí portrétu
+      pCtx.fillStyle = '#222244';
+      pCtx.fillRect(0, 0, 32, 32);
+
+      if (type === 'wada') {
+        // Komisař WADA (Modrá čepice, sluneční brýle / odznak)
+        pCtx.fillStyle = '#000AFF'; pCtx.fillRect(6, 6, 20, 8); // Čepice
+        pCtx.fillStyle = '#ffcc99'; pCtx.fillRect(8, 14, 16, 12); // Obličej
+        pCtx.fillStyle = '#000000'; pCtx.fillRect(10, 16, 5, 4); pCtx.fillRect(17, 16, 5, 4); // Brýle
+        pCtx.fillStyle = '#ffffff'; pCtx.fillRect(12, 24, 8, 3); // Ústa
+      } else if (type === 'doctor') {
+        // Lékař (Bílá čelenka s červeným křížem)
+        pCtx.fillStyle = '#ffffff'; pCtx.fillRect(6, 6, 20, 6); // Čelenka
+        pCtx.fillStyle = '#ff0000'; pCtx.fillRect(14, 7, 4, 4); // Kříž
+        pCtx.fillStyle = '#ffdbac'; pCtx.fillRect(8, 12, 16, 14); // Obličej
+        pCtx.fillStyle = '#000000'; pCtx.fillRect(11, 15, 3, 3); pCtx.fillRect(18, 15, 3, 3); // Oči
+        pCtx.fillStyle = '#996633'; pCtx.fillRect(13, 23, 6, 2); // Ústa
+      } else if (type === 'lawyer') {
+        // Pan Exner / Právník (Oblek, kravata, brýle)
+        pCtx.fillStyle = '#333333'; pCtx.fillRect(6, 4, 20, 8); // Vlasy
+        pCtx.fillStyle = '#f5d0b1'; pCtx.fillRect(8, 12, 16, 14); // Obličej
+        pCtx.fillStyle = '#000000'; pCtx.fillRect(11, 15, 4, 3); pCtx.fillRect(17, 15, 4, 3); // Oči
+        pCtx.fillStyle = '#ff0000'; pCtx.fillRect(15, 22, 2, 6); // Kravata
+        pCtx.fillStyle = '#000AFF'; pCtx.fillRect(8, 26, 16, 6); // Oblek
+      }
+    }
+
     let questionPool = [];
     function getUniqueQuestion() {
       if (questionPool.length === 0) {
@@ -211,9 +319,7 @@
     const player = { x: lanes[1], targetX: lanes[1], y: 800, radius: 24 };
     let items = []; let wadaGate = null; let spawnTimer = 0; let gateTimer = 0;
 
-    // Proměnné pro sledování swipu
-    let touchStartX = 0;
-    let touchStartY = 0;
+    let touchStartX = 0; let touchStartY = 0;
 
     window.addEventListener('keydown', (e) => {
       if (!isRunning || isQuizActive) return;
@@ -221,7 +327,6 @@
       else if (e.key === 'ArrowRight' && currentLane < lanes.length - 1) { currentLane++; player.targetX = lanes[currentLane]; }
     });
     
-    // Nové swipovací ovládání
     canvas.addEventListener('touchstart', (e) => {
       e.preventDefault();
       if (!isRunning || isQuizActive) return;
@@ -235,21 +340,15 @@
 
       const touchEndX = e.changedTouches[0].clientX;
       const touchEndY = e.changedTouches[0].clientY;
-
       const diffX = touchEndX - touchStartX;
       const diffY = touchEndY - touchStartY;
-      const threshold = 35; // Minimální délka tažení v pixelech pro zaregistrování swipu
+      const threshold = 35;
 
-      // Zjistíme, jestli byl pohyb víc horizontální než vertikální
       if (Math.abs(diffX) > Math.abs(diffY)) {
         if (diffX > threshold && currentLane < lanes.length - 1) {
-          // Swipe doprava
-          currentLane++;
-          player.targetX = lanes[currentLane];
+          currentLane++; player.targetX = lanes[currentLane];
         } else if (diffX < -threshold && currentLane > 0) {
-          // Swipe doleva
-          currentLane--;
-          player.targetX = lanes[currentLane];
+          currentLane--; player.targetX = lanes[currentLane];
         }
       }
     }, { passive: false });
@@ -307,18 +406,22 @@
       document.getElementById('livesVal').innerText = lives;
     }
 
+    // SPUŠTĚNÍ CUTSCÉNY
     function triggerQuiz(type) {
       isRunning = false; isQuizActive = true;
       const qData = getUniqueQuestion();
       
-      const titleEl = document.getElementById('quiz-title'); const descEl = document.getElementById('quiz-desc');
+      const titleEl = document.getElementById('quiz-title');
       if (type === 'wada') {
-        titleEl.innerText = "DOPINGOVÁ KONTROLA"; descEl.innerText = "Ve vašem vzorku byly nalezeny zakázané látky. Prokážete znalost pravidel?";
+        titleEl.innerText = "KOMISAŘ WADA";
       } else if (type === 'doctor') {
-        titleEl.innerText = "LÉKAŘSKÁ PROHLÍDKA"; descEl.innerText = "Ukažte své znalosti a získejte +1 život (Max 5).";
+        titleEl.innerText = "SPORTOVNÍ LÉKAŘ";
       } else if (type === 'lawyer') {
-        titleEl.innerText = "KONZULTACE S PANEM EXNEREM"; descEl.innerText = "Zodpovězte správně dotaz a Pan Exner vymaže váš doping.";
+        titleEl.innerText = "MGR. EXNER (PRÁVNÍK)";
       }
+
+      // Vykreslení pixel art postavy do cutscény
+      drawPixelAvatar(type);
 
       const qText = document.getElementById('question-text');
       qText.innerHTML = `${qData.q}`;
@@ -358,9 +461,10 @@
       if (isFatal) {
         document.getElementById('quiz-modal').style.display = 'none'; gameOver(resTitle, resText);
       } else {
-        document.getElementById('question-text').innerHTML = `<span style="font-size: 22px; color: #000AFF;">${resTitle}</span><br><br>${resText}`;
+        document.getElementById('question-text').innerHTML = `<span style="font-size: 18px; color: var(--adv-gold);">${resTitle}</span><br><br>${resText}`;
         const btn = document.createElement('button');
         btn.className = 'action-btn'; btn.innerText = "POKRAČOVAT V ZÁVODU";
+        btn.style.margin = "10px auto 0 auto";
         btn.onclick = function() {
           document.getElementById('quiz-modal').style.display = 'none'; isQuizActive = false;
           isRunning = true; updateUI(); requestAnimationFrame(gameLoop);
