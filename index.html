@@ -37,7 +37,6 @@
     #danger-box { border-left-color: var(--adv-gold); }
     #lives-box { border-left-color: var(--adv-white); border: 2px solid var(--adv-black); color: var(--adv-black); background: var(--adv-white); }
     
-    /* Větší vertikální box: Typický formát mobilu (9:16). Omezeno na 75 % výšky okna, aby nebylo nutné scrollovat */
     #game-container {
       position: relative; border: 6px solid var(--adv-black); border-radius: 4px; 
       overflow: hidden; width: 95%; max-width: 500px; aspect-ratio: 9 / 16; max-height: 75vh;
@@ -97,7 +96,6 @@
   </div>
 
   <div id="game-container">
-    <!-- Plátno prodlouženo na 540x960 (poměr 9:16) -->
     <canvas id="gameCanvas" width="540" height="960"></canvas>
   </div>
 
@@ -105,7 +103,7 @@
     <div class="modal-content">
       <h2 id="overlayTitle">Pravidla fair play</h2>
       <div id="overlayDesc" style="text-align: left; margin-bottom: 15px;">
-        <b>Ovládání:</b> Dotyk LEVÉ nebo PRAVÉ poloviny obrazovky (Šipky na PC).<br><br>
+        <b>Ovládání:</b> Přejetí prstem (swipe) doleva nebo doprava po obrazovce (Šipky na PC).<br><br>
         🍏 💧 <b>Čistá výživa:</b> +12 % energie.<br>
         💊 🔵 ⚫ <b>Doping:</b> Rychlá energie, ale drží se v krvi (🔴 až 15s)!<br>
         🩺 <b>Lékař:</b> Kvíz o +1 život (Max 5).<br>
@@ -146,7 +144,6 @@
     import { getDatabase, ref, push, onValue, remove, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
     import { questions } from './questions.js';
 
-    // FIREBASE NASTAVENÍ
     const firebaseConfig = {
       apiKey: "AIzaSyDYXM5ioUkvXIKrgQVSjYxjacqn8vm2vBA",
       authDomain: "clean-runner.firebaseapp.com",
@@ -210,11 +207,13 @@
     let score = 0; let energy = 100; let speed = 6; let lives = 3;
     let dopingFrames = 0; const maxDopingFrames = 900; 
     
-    // Tři dráhy pro šířku 540px
     const lanes = [90, 270, 450]; let currentLane = 1;
-    // Hráč posunutý níže na delším plátně (y = 800)
     const player = { x: lanes[1], targetX: lanes[1], y: 800, radius: 24 };
     let items = []; let wadaGate = null; let spawnTimer = 0; let gateTimer = 0;
+
+    // Proměnné pro sledování swipu
+    let touchStartX = 0;
+    let touchStartY = 0;
 
     window.addEventListener('keydown', (e) => {
       if (!isRunning || isQuizActive) return;
@@ -222,11 +221,37 @@
       else if (e.key === 'ArrowRight' && currentLane < lanes.length - 1) { currentLane++; player.targetX = lanes[currentLane]; }
     });
     
+    // Nové swipovací ovládání
     canvas.addEventListener('touchstart', (e) => {
-      e.preventDefault(); if (!isRunning || isQuizActive) return;
-      const rect = canvas.getBoundingClientRect(); const touchX = e.touches[0].clientX - rect.left;
-      if (touchX < rect.width / 2 && currentLane > 0) { currentLane--; player.targetX = lanes[currentLane]; } 
-      else if (touchX >= rect.width / 2 && currentLane < lanes.length - 1) { currentLane++; player.targetX = lanes[currentLane]; }
+      e.preventDefault();
+      if (!isRunning || isQuizActive) return;
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    }, { passive: false });
+
+    canvas.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      if (!isRunning || isQuizActive) return;
+
+      const touchEndX = e.changedTouches[0].clientX;
+      const touchEndY = e.changedTouches[0].clientY;
+
+      const diffX = touchEndX - touchStartX;
+      const diffY = touchEndY - touchStartY;
+      const threshold = 35; // Minimální délka tažení v pixelech pro zaregistrování swipu
+
+      // Zjistíme, jestli byl pohyb víc horizontální než vertikální
+      if (Math.abs(diffX) > Math.abs(diffY)) {
+        if (diffX > threshold && currentLane < lanes.length - 1) {
+          // Swipe doprava
+          currentLane++;
+          player.targetX = lanes[currentLane];
+        } else if (diffX < -threshold && currentLane > 0) {
+          // Swipe doleva
+          currentLane--;
+          player.targetX = lanes[currentLane];
+        }
+      }
     }, { passive: false });
 
     startBtn.addEventListener('click', () => {
