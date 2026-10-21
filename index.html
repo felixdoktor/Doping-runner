@@ -358,7 +358,7 @@
     let warningText = "";
     let warningTimer = 0;
 
-    // Široké dráhy odpovídající rozvržení
+    // Původní široké dráhy [110, 270, 430]
     const lanes = [110, 270, 430]; 
     let currentLane = 1;
     const player = { x: lanes[1], targetX: lanes[1], y: 820, radius: 26 };
@@ -758,23 +758,16 @@
         
         let sourceY = progress * maxSourceY;
 
-        ctx.save();
+        // Pokud je přechod obrácený, spočítáme sourceY zespodu nahoru bez nutnosti rotace plátna
         if (flip) {
-          ctx.translate(canvas.width, canvas.height);
-          ctx.rotate(Math.PI);
           sourceY = maxSourceY - sourceY;
         }
 
-        // PŘESNÉ ZAROVNÁNÍ: Horizontální ořez (crop) tak,
-        // aby silnice v obrázku přesně pokryla široké dráhy [110, 270, 430]
-        let cropW = 200;
-        let cropX = 170;
-
+        // Vykreslení celé šířky obrázku na celou šířku plátna 1:1 bez ořezu
         ctx.drawImage(bgImg, 
-          cropX, sourceY, cropW, visibleH, 
+          0, sourceY, imgW, visibleH, 
           0, 0, canvas.width, canvas.height
         );
-        ctx.restore();
       } else {
         ctx.fillStyle = '#2c2c3e';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -868,7 +861,7 @@
     });
 
     document.getElementById('teacher-reset').addEventListener('click', () => {
-      const pwd = prompt("Zadej heslo učitele pro vymazání žebříčku:");
+      The pwd = prompt("Zadej heslo učitele pro vymazání žebříčku:");
       if (pwd === TEACHER_PASSWORD) {
          if (db) { remove(ref(db, 'scores')); alert("Žebříček byl vymazán."); }
       } else if (pwd !== null) { alert("Špatné heslo!"); }
