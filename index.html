@@ -197,7 +197,6 @@
     </div>
   </div>
 
-  <!-- DIALOGOVÉ OKNO CUTSCÉNY -->
   <div id="quiz-modal" class="modal-overlay">
     <div class="rs-dialogue-box">
       <div id="quiz-title" class="rs-header">POSTAVA</div>
@@ -399,9 +398,9 @@
       document.getElementById('livesVal').innerText = lives;
     }
 
-    // TYPEWRITER EFEKT (POSTUPNÉ VYPISOVÁNÍ TEXTU)
+    // TYPEWRITER S LEHKOU PAUZOU PO DOKONČENÍ TEXTU (500 ms)
     let typingTimer = null;
-    function typeWriterText(element, text, speed = 20, callback) {
+    function typeWriterText(element, text, speed = 20, pauseAfter = 500, callback) {
       if (typingTimer) clearInterval(typingTimer);
       element.innerHTML = "";
       let i = 0;
@@ -411,12 +410,14 @@
           i++;
         } else {
           clearInterval(typingTimer);
-          if (callback) callback();
+          if (callback) {
+            setTimeout(callback, pauseAfter);
+          }
         }
       }, speed);
     }
 
-    // SPUŠTĚNÍ CUTSCÉNY S KROKY
+    // SPUŠTĚNÍ CUTSCÉNY S KROKY A PAUZAMI
     function triggerQuiz(type) {
       isRunning = false; isQuizActive = true;
       const qData = getUniqueQuestion();
@@ -436,7 +437,6 @@
 
       drawPixelAvatar(type);
 
-      // FÁZE 1: Úvodní text (kdo tě chytil / kam jsi přišel)
       let introText = "";
       if (type === 'wada') {
         introText = "Pozor! Zastavila vás hlídka dopingové kontroly. Váš vzorek vykazuje stopy dopingu. Komisař požaduje okamžité vysvětlení!";
@@ -446,8 +446,8 @@
         introText = "Setkali jste se s Mgr. Exnerem za účelem právní konzultace. Pan Exner vám chce položit zkušební otázku.";
       }
 
-      typeWriterText(qText, introText, 20, () => {
-        // Po vypsání úvodu se ukáže tlačítko pro pokročilou otázku
+      // Fáze 1: Výpis úvodu -> pauza -> zobrazení tlačítka
+      typeWriterText(qText, introText, 20, 500, () => {
         const nextBtn = document.createElement('button');
         nextBtn.className = 'quiz-btn';
         nextBtn.style.textAlign = "center";
@@ -456,9 +456,8 @@
         nextBtn.innerText = "ZPOVÍDAT SE / ZODPOVĚDĚT DOTAZ ➡️";
         nextBtn.onclick = function() {
           ansCont.innerHTML = '';
-          // FÁZE 2: Postupné vypisování samotné otázky
-          typeWriterText(qText, qData.q, 20, () => {
-            // Teprve po dopsání otázky se vykreslí tlačítka s možnostmi
+          // Fáze 2: Výpis samotné otázky -> pauza -> zobrazení možností
+          typeWriterText(qText, qData.q, 20, 500, () => {
             qData.options.forEach((opt, index) => {
               const btn = document.createElement('button');
               btn.className = 'quiz-btn'; 
@@ -499,8 +498,8 @@
       if (isFatal) {
         document.getElementById('quiz-modal').style.display = 'none'; gameOver(resTitle, resText);
       } else {
-        // FÁZE 3: Postupné vypsání výsledku odpovědi
-        typeWriterText(qText, `${resTitle} - ${resText}`, 20, () => {
+        // Fáze 3: Výpis výsledku -> pauza -> tlačítko pokračovat
+        typeWriterText(qText, `${resTitle} - ${resText}`, 20, 500, () => {
           const btn = document.createElement('button');
           btn.className = 'action-btn'; btn.innerText = "POKRAČOVAT V ZÁVODU";
           btn.style.margin = "10px auto 0 auto";
