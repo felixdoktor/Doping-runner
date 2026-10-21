@@ -172,7 +172,7 @@
       <div id="overlayDesc" style="text-align: left; margin-bottom: 15px;">
         <b>Ovládání:</b> Přejetí prstem (swipe) doleva nebo doprava (Šipky na PC).<br><br>
         🍏 💧 <b>Čistá výživa:</b> +12 % energie.<br>
-        💊 🔵 ⚫ <b>Doping:</b> Rychlá energie, ale drží se v krvi (🔴 až 15s)!<br>
+        💊 🔵 ⚫ <b>Doping:</b> Rychlá energie, ale běžec oblékne černé oblečení a drží se v krvi (🔴 až 15s)!<br>
         🩺 <b>Lékař:</b> RPG cutscéna o +1 život (Max 5).<br>
         💼 <b>Právník:</b> Cutscéna s Panem Exnerem o smazání dopingu.<br>
         🚧 <b>Kontrola WADA:</b> Kvízová cutscéna. Scéna se mění (Město ➔ Stadion ➔ Les)!
@@ -307,13 +307,12 @@
     let score = 0; let energy = 100; let speed = 6; let lives = 3;
     let dopingFrames = 0; const maxDopingFrames = 900; 
     
-    // 2D Dráhy (X pozice)
     const lanes = [110, 270, 430]; 
     let currentLane = 1;
     const player = { x: lanes[1], targetX: lanes[1], y: 820, radius: 26 };
     
     let items = []; let wadaGate = null; let spawnTimer = 0; let gateTimer = 0;
-    let roadScrollOffset = 0; // Pro animaci detailů na cestě
+    let roadScrollOffset = 0;
 
     let touchStartX = 0; let touchStartY = 0;
 
@@ -527,7 +526,6 @@
     }
 
     function update() {
-      // Posun textury cesty pro efekt rychlosti
       roadScrollOffset = (roadScrollOffset + speed) % 40;
 
       energy -= 0.10; 
@@ -550,7 +548,6 @@
         const item = items[i]; 
         item.y += speed; 
         
-        // Kolize hráče s předmětem
         const targetX = lanes[item.lane];
         if (Math.abs(item.y - player.y) < 40) {
           if (Math.abs(targetX - player.x) < 35) {
@@ -568,17 +565,16 @@
     }
 
     function draw() {
-      // URČENÍ AKTUÁLNÍHO BIOMU PODLE SKÓRE
-      let roadBg = '#2c2c3e'; // Město
+      let roadBg = '#2c2c3e'; 
       let lineCol = '#ffffff';
       let sideCol = '#1a1a26';
 
       if (score >= 1000 && score < 2500) {
-        roadBg = '#8b0000'; // Stadion (tartan)
+        roadBg = '#8b0000'; 
         lineCol = '#ffffe0';
         sideCol = '#550000';
       } else if (score >= 2500) {
-        roadBg = '#2e8b57'; // Les (přírodní cesta)
+        roadBg = '#2e8b57'; 
         lineCol = '#adff2f';
         sideCol = '#004d1a';
       }
@@ -592,7 +588,7 @@
       ctx.fillStyle = roadBg;
       ctx.fillRect(60, 0, canvas.width - 120, canvas.height);
 
-      // 2. Detaily na cestě (pohyblivé středové čáry pro efekt rychlosti)
+      // 2. Detaily na cestě
       ctx.strokeStyle = lineCol; 
       ctx.lineWidth = 4; 
       ctx.setLineDash([25, 20]);
@@ -602,9 +598,8 @@
       ctx.moveTo(200, 0); ctx.lineTo(200, canvas.height); 
       ctx.moveTo(340, 0); ctx.lineTo(340, canvas.height);
       ctx.stroke(); 
-      ctx.setLineDash([]); // Reset čar
+      ctx.setLineDash([]); 
 
-      // Okrajové obrubníky cesty
       ctx.fillStyle = "rgba(255,255,255,0.2)";
       ctx.fillRect(60, 0, 8, canvas.height);
       ctx.fillRect(canvas.width - 68, 0, 8, canvas.height);
@@ -630,15 +625,47 @@
         }
       }
 
-      // 5. Vykreslení hráče
-      const targetPlayerX = lanes[currentLane];
-      player.x += (targetPlayerX - player.x) * 0.2; 
+      // 5. Vykreslení animovaného hráče (panáček s běžeckou animací a změnou barvy podle dopingu)
+      const targetX = lanes[currentLane];
+      player.x += (targetX - player.x) * 0.2; 
+
+      const isDoping = dopingFrames > 0;
+      const shirtColor = isDoping ? '#000000' : '#000AFF'; // Modré nebo černé oblečení
+      const pantsColor = isDoping ? '#222222' : '#003366';
       
-      ctx.beginPath(); 
-      ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
-      ctx.fillStyle = dopingFrames > 0 ? '#000000' : '#D7C08C'; 
+      const legOffset = Math.sin(score * 0.3) * 8;
+      const armOffset = Math.cos(score * 0.3) * 8;
+
+      // Hlava
+      ctx.beginPath();
+      ctx.arc(player.x, player.y - 25, 10, 0, Math.PI * 2);
+      ctx.fillStyle = '#ffdbac';
       ctx.fill();
-      ctx.lineWidth = 4; ctx.strokeStyle = '#FFFFFF'; ctx.stroke();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = '#000000';
+      ctx.stroke();
+
+      // Trup (tričko) - barva se mění podle dopingu
+      ctx.fillStyle = shirtColor;
+      ctx.fillRect(player.x - 10, player.y - 15, 20, 22);
+
+      // Nohy s animací běhu
+      ctx.strokeStyle = pantsColor;
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(player.x - 5, player.y + 7);
+      ctx.lineTo(player.x - 8 + legOffset, player.y + 25);
+      ctx.moveTo(player.x + 5, player.y + 7);
+      ctx.lineTo(player.x + 8 - legOffset, player.y + 25);
+      ctx.stroke();
+
+      // Ruce s animací běhu
+      ctx.beginPath();
+      ctx.moveTo(player.x - 10, player.y - 10);
+      ctx.lineTo(player.x - 15 - armOffset, player.y + 2);
+      ctx.moveTo(player.x + 10, player.y - 10);
+      ctx.lineTo(player.x + 15 + armOffset, player.y + 2);
+      ctx.stroke();
     }
 
     function gameLoop() { if (isRunning && !isQuizActive) { update(); draw(); requestAnimationFrame(gameLoop); } }
