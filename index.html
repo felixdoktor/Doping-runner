@@ -352,7 +352,6 @@
     let dopingFrames = 0; const maxDopingFrames = 900; 
     let hasTUE = false;
 
-    // Proměnná pro plynulý pixelový posun pozadí (pohybuje se přesně se speed)
     let worldScrollY = 0;
 
     let stats = { dopeCount: 0, wadaTotal: 0, wadaPassed: 0, doctorCount: 0, lawyerCount: 0, tueUsed: 0 };
@@ -404,7 +403,7 @@
       isRunning = true; isQuizActive = false;
       score = 0; energy = 100; dopingFrames = 0; speed = 6; lives = 3; currentLane = 1; 
       hasTUE = false;
-      worldScrollY = 0; // Reset pozice pozadí
+      worldScrollY = 0;
       helpItemsSpawnedCount = 0;
       stats = { dopeCount: 0, wadaTotal: 0, wadaPassed: 0, doctorCount: 0, lawyerCount: 0, tueUsed: 0 };
       items = []; wadaGate = null; spawnTimer = 0; gateTimer = 0;
@@ -634,7 +633,6 @@
       
       if (dopingFrames > 0) dopingFrames--; 
       
-      // Posun světa (pozadí se teď hýbe úplně plynule podle rychlosti 'speed')
       worldScrollY += speed;
       score += speed / 10; 
       speed += 0.002; 
@@ -730,35 +728,34 @@
       }
     }
 
-    // Modulární výběr pozadí řízený plynulým posunem světa (worldScrollY)
+    // Správné mapování směrů pro sektory a nové přechody (inversion zohledňující orientaci obrázků)
     function getModularBackground(scrollY) {
-      // Každý sektor / přechod tvoří úsek o velikosti např. 2500 pixelů posunu
       const sectorStep = 2500;
       const totalLoop = sectorStep * 6;
       let pos = scrollY % totalLoop;
 
       if (pos < sectorStep) {
-        return { img: images.bgCity, progress: pos / sectorStep, flip: false };
+        return { img: images.bgCity, progress: pos / sectorStep, invert: false };
       } else if (pos < sectorStep * 2) {
-        return { img: images.bgCityToForest, progress: (pos - sectorStep) / sectorStep, flip: false };
+        return { img: images.bgCityToForest, progress: (pos - sectorStep) / sectorStep, invert: true };
       } else if (pos < sectorStep * 3) {
-        return { img: images.bgForest, progress: (pos - sectorStep * 2) / sectorStep, flip: false };
+        return { img: images.bgForest, progress: (pos - sectorStep * 2) / sectorStep, invert: false };
       } else if (pos < sectorStep * 4) {
-        return { img: images.bgForestToStadium, progress: (pos - sectorStep * 3) / sectorStep, flip: false };
+        return { img: images.bgForestToStadium, progress: (pos - sectorStep * 3) / sectorStep, invert: true };
       } else if (pos < sectorStep * 5) {
-        return { img: images.bgStadium, progress: (pos - sectorStep * 4) / sectorStep, flip: false };
+        return { img: images.bgStadium, progress: (pos - sectorStep * 4) / sectorStep, invert: false };
       } else {
-        return { img: images.bgStadiumToCity, progress: (pos - sectorStep * 5) / sectorStep, flip: false };
+        return { img: images.bgStadiumToCity, progress: (pos - sectorStep * 5) / sectorStep, invert: true };
       }
     }
 
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      // Získání aktuálního dílu pozadí podle worldScrollY
       let bgData = getModularBackground(worldScrollY);
       let bgImg = bgData.img;
       let progress = bgData.progress;
+      let invert = bgData.invert;
 
       if (bgImg && bgImg.complete && bgImg.naturalHeight > 0) {
         let imgH = bgImg.naturalHeight;
@@ -768,6 +765,10 @@
         if (maxSourceY < 0) maxSourceY = 0;
         
         let sourceY = progress * maxSourceY;
+
+        if (invert) {
+          sourceY = maxSourceY - sourceY;
+        }
 
         ctx.drawImage(bgImg, 
           0, sourceY, imgW, visibleH, 
@@ -861,7 +862,6 @@
       });
     }
 
-    document.getElementById('closeLeaderboardDialog') // (pomocný prvek)
     document.getElementById('closeLeaderboardBtn').addEventListener('click', () => { 
       document.getElementById('leaderboard-modal').style.display = 'none'; 
     });
