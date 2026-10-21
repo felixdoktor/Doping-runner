@@ -21,25 +21,26 @@
     
     h1 {
       color: var(--adv-blue); font-weight: bold; text-transform: uppercase;
-      letter-spacing: 1px; margin-bottom: 10px; text-align: center;
-      font-size: 24px;
+      letter-spacing: 1px; margin-bottom: 5px; text-align: center;
+      font-size: 22px;
     }
 
     #ui {
-      display: flex; gap: 8px; margin-bottom: 10px; font-size: 15px; font-weight: bold;
+      display: flex; gap: 6px; margin-bottom: 8px; font-size: 14px; font-weight: bold;
       flex-wrap: wrap; justify-content: center; width: 95%; max-width: 500px;
     }
     
     .hud-box {
-      background: var(--adv-black); color: var(--adv-white); padding: 8px 12px; 
-      border-radius: 4px; border-left: 6px solid var(--adv-blue);
+      background: var(--adv-black); color: var(--adv-white); padding: 6px 10px; 
+      border-radius: 4px; border-left: 5px solid var(--adv-blue);
     }
     #danger-box { border-left-color: var(--adv-gold); }
     #lives-box { border-left-color: var(--adv-white); border: 2px solid var(--adv-black); color: var(--adv-black); background: var(--adv-white); }
+    #tue-box { border-left-color: #00ffcc; color: #00ffcc; }
     
     #game-container {
       position: relative; border: 6px solid var(--adv-black); border-radius: 4px; 
-      overflow: hidden; width: 95%; max-width: 500px; aspect-ratio: 9 / 16; max-height: 75vh;
+      overflow: hidden; width: 95%; max-width: 500px; aspect-ratio: 9 / 16; max-height: 72vh;
       box-shadow: 0 10px 30px rgba(0,0,0,0.15);
     }
     
@@ -51,15 +52,15 @@
     }
     .modal-content {
       background: var(--adv-white); border-top: 10px solid var(--adv-blue); border-radius: 8px;
-      padding: 25px; text-align: center; max-width: 90%; width: 550px; max-height: 90vh; overflow-y: auto;
+      padding: 20px; text-align: center; max-width: 90%; width: 550px; max-height: 90vh; overflow-y: auto;
       box-shadow: 0 0 20px rgba(0,0,0,0.5);
     }
-    .modal-content h2 { margin-top: 0; font-size: 24px; color: var(--adv-blue); font-weight: bold; }
-    .modal-content p { font-size: 14px; line-height: 1.5; color: var(--adv-black); margin-bottom: 20px; }
+    .modal-content h2 { margin-top: 0; font-size: 22px; color: var(--adv-blue); font-weight: bold; }
+    .modal-content p { font-size: 13px; line-height: 1.4; color: var(--adv-black); margin-bottom: 15px; text-align: left; }
     
     button.action-btn {
-      background: var(--adv-blue); color: var(--adv-white); border: none; padding: 14px 20px;
-      font-size: 16px; font-weight: bold; border-radius: 30px; cursor: pointer; margin: 8px 5px;
+      background: var(--adv-blue); color: var(--adv-white); border: none; padding: 12px 20px;
+      font-size: 15px; font-weight: bold; border-radius: 30px; cursor: pointer; margin: 6px 5px;
       width: 100%; max-width: 300px; transition: background 0.2s;
     }
     button.action-btn:hover { background: var(--adv-black); }
@@ -67,6 +68,17 @@
     
     #startLeaderboardBtn { background: var(--adv-black); border: 2px solid var(--adv-gold); }
     #startLeaderboardBtn:hover { background: #333; }
+
+    /* Výběr sportovce */
+    .athlete-select {
+      display: flex; gap: 10px; justify-content: center; margin-bottom: 15px;
+    }
+    .athlete-card {
+      border: 2px solid #ccc; border-radius: 8px; padding: 10px; cursor: pointer; width: 48%; text-align: center; background: #f9f9f9; transition: all 0.2s;
+    }
+    .athlete-card.selected {
+      border-color: var(--adv-blue); background: #eef2ff; font-weight: bold;
+    }
     
     /* RUNEKSPEAKÉ DIALOGOVÉ OKNO */
     .rs-dialogue-box {
@@ -143,23 +155,22 @@
     
     #leaderboard-modal { z-index: 1010; }
     #leaderboard-list { list-style: none; padding: 0; text-align: left; max-width: 350px; margin: 20px auto; }
-    #leaderboard-list li { padding: 12px 10px; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; font-size: 18px; }
-    #leaderboard-list li:nth-child(1) { font-weight: bold; color: var(--adv-gold); font-size: 22px; }
-    #leaderboard-list li:nth-child(2) { font-weight: bold; color: #888; font-size: 20px;}
-    #leaderboard-list li:nth-child(3) { font-weight: bold; color: #cd7f32; font-size: 20px;}
+    #leaderboard-list li { padding: 10px; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; font-size: 16px; }
+    #leaderboard-list li:nth-child(1) { font-weight: bold; color: var(--adv-gold); font-size: 20px; }
     
-    #playerName { border: 2px solid var(--adv-blue); border-radius: 30px; padding: 12px 20px; font-size: 16px; width: 80%; text-align: center; margin-bottom: 15px; }
+    #playerName { border: 2px solid var(--adv-blue); border-radius: 30px; padding: 10px 20px; font-size: 15px; width: 80%; text-align: center; margin-bottom: 10px; }
   </style>
 </head>
 <body>
 
-  <h1>Clean Runner</h1>
+  <h1>Clean Runner: Fair Play</h1>
   
   <div id="ui">
-    <div class="hud-box">Skóre: <span id="distVal">0</span></div>
+    <div class="hud-box">Skóre: <span id="distVal">0</span>m</div>
     <div class="hud-box">⚡ <span id="energyVal">100</span>%</div>
     <div class="hud-box" id="danger-box">Doping: <span id="dopingVal">0</span>%</div>
     <div class="hud-box" id="lives-box">❤️: <span id="livesVal">3</span>/5</div>
+    <div class="hud-box" id="tue-box" style="display:none;">📜 TUE: <span id="tueStatus">Aktivní</span></div>
   </div>
 
   <div id="game-container">
@@ -168,20 +179,33 @@
 
   <div id="overlay" class="modal-overlay" style="display: flex;">
     <div class="modal-content">
-      <h2 id="overlayTitle">Pravidla fair play</h2>
-      <div id="overlayDesc" style="text-align: left; margin-bottom: 15px;">
-        <b>Ovládání:</b> Přejetí prstem (swipe) doleva nebo doprava (Šipky na PC).<br><br>
-        🍏 💧 <b>Čistá výživa:</b> +12 % energie.<br>
-        💊 🔵 ⚫ <b>Doping:</b> Rychlá energie, ale běžec oblékne černé oblečení a drží se v krvi (🔴 až 15s)!<br>
-        🩺 <b>Lékař:</b> RPG cutscéna o +1 život (Max 5).<br>
-        💼 <b>Právník:</b> Cutscéna s Panem Exnerem o smazání dopingu.<br>
-        🚧 <b>Kontrola WADA:</b> Kvízová cutscéna. Scéna se mění (Město ➔ Stadion ➔ Les)!
+      <h2 id="overlayTitle">Projekt: Čistý sport</h2>
+      
+      <!-- Výběr typu sportovce -->
+      <div id="athlete-selection-area">
+        <p style="text-align:center; font-weight:bold; margin-bottom:8px;">Vyber si herní profil sportovce:</p>
+        <div class="athlete-select">
+          <div class="athlete-card selected" id="cardVytrvalec" onclick="setAthlete('vytrvalec')">
+            <b>🏃 Vytrvalec</b><br><span style="font-size:11px; color:#555;">Stabilní výdej energie, pomalejší růst dopingu.</span>
+          </div>
+          <div class="athlete-card" id="cardKulturista" onclick="setAthlete('kulturista')">
+            <b>🏋️ Silový sportovec</b><br><span style="font-size:11px; color:#555;">Rychlejší úbytek sil, ale doplňky dávají víc energie.</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="overlayDesc">
+        <b>Pravidla a mechaniky:</b><br>
+        • <b>Swipe doleva/doprava:</b> Uhýbání na trati.<br>
+        • <b>Princip striktní odpovědnosti:</b> Za obsah v těle zodpovídáš ty! Pozor na neověřené doplňky.<br>
+        • 📜 <b>Terapeutická výjimka (TUE):</b> Unikátní dokument, který tě jednou zachrání před trestem WADA.<br>
+        • 🩺 Lékař & 💼 Právník: Pomohou ti získat život nebo očistit krev, pokud odpovíš správně na otázku z antidopingu.
       </div>
       
       <div id="name-input-container" style="display: none;">
-        <input type="text" id="playerName" placeholder="Tvé jméno (např. Jan N.)" maxlength="15"><br>
+        <input type="text" id="playerName" placeholder="Tvé jméno / Tým" maxlength="15"><br>
         <button class="action-btn" id="saveScoreBtn">ZAPSAT DO ŽEBŘÍČKU</button><br>
-        <button class="action-btn" id="skipScoreBtn" style="background: #666; padding: 10px 20px; font-size: 14px;">PŘESKOČIT</button>
+        <button class="action-btn" id="skipScoreBtn" style="background: #666; padding: 8px 15px; font-size: 13px;">PŘESKOČIT</button>
       </div>
 
       <button class="action-btn" id="startBtn">ZAHÁJIT ZÁVOD</button>
@@ -240,7 +264,8 @@
       dope_blue: new Image(),
       dope_bad: new Image(),
       doctor: new Image(),
-      lawyer: new Image()
+      lawyer: new Image(),
+      tue: new Image()
     };
 
     images.clean[0].src = 'clean1.png';
@@ -250,6 +275,16 @@
     images.dope_bad.src = 'dope_black.png'; 
     images.doctor.src = 'doctor.png';
     images.lawyer.src = 'lawyer.png';
+    // Pokud uživatel nemá obrázek tue.png, vykreslí se text/zástupný symbol automaticky
+    images.tue.src = 'tue.png'; 
+
+    // Výběr sportovce (Globální funkce pro HTML)
+    window.selectedType = 'vytrvalec';
+    window.setAthlete = function(type) {
+      window.selectedType = type;
+      document.getElementById('cardVytrvalec').className = type === 'vytrvalec' ? 'athlete-card selected' : 'athlete-card';
+      document.getElementById('cardKulturista').className = type === 'kulturista' ? 'athlete-card selected' : 'athlete-card';
+    };
 
     function drawPixelAvatar(type) {
       const pCanvas = document.getElementById('pixelPortrait');
@@ -297,6 +332,7 @@
     const overlay = document.getElementById('overlay');
     const overlayTitle = document.getElementById('overlayTitle');
     const overlayDesc = document.getElementById('overlayDesc');
+    const athleteArea = document.getElementById('athlete-selection-area');
     const nameInputContainer = document.getElementById('name-input-container');
     const startBtn = document.getElementById('startBtn');
     const startLeaderboardBtn = document.getElementById('startLeaderboardBtn');
@@ -306,7 +342,15 @@
     let isRunning = false; let isQuizActive = false;
     let score = 0; let energy = 100; let speed = 6; let lives = 3;
     let dopingFrames = 0; const maxDopingFrames = 900; 
+    let hasTUE = false; // Terapeutická výjimka (štít)
+
+    // Herní statistiky pro závěrečný edukativní report
+    let stats = { dopeCount: 0, wadaTotal: 0, wadaPassed: 0, doctorCount: 0, lawyerCount: 0, tueUsed: 0 };
     
+    // Varovná hláška na plátně (Princip striktní odpovědnosti)
+    let warningText = "";
+    let warningTimer = 0;
+
     const lanes = [110, 270, 430]; 
     let currentLane = 1;
     const player = { x: lanes[1], targetX: lanes[1], y: 820, radius: 26 };
@@ -340,19 +384,21 @@
       const threshold = 35;
 
       if (Math.abs(diffX) > Math.abs(diffY)) {
-        if (diffX > threshold && currentLane < 2) {
-          currentLane++;
-        } else if (diffX < -threshold && currentLane > 0) {
-          currentLane--;
-        }
+        if (diffX > threshold && currentLane < 2) { currentLane++; } 
+        else if (diffX < -threshold && currentLane > 0) { currentLane--; }
       }
     }, { passive: false });
 
     startBtn.addEventListener('click', () => {
       isRunning = true; isQuizActive = false;
       score = 0; energy = 100; dopingFrames = 0; speed = 6; lives = 3; currentLane = 1; 
+      hasTUE = false;
+      stats = { dopeCount: 0, wadaTotal: 0, wadaPassed: 0, doctorCount: 0, lawyerCount: 0, tueUsed: 0 };
       items = []; wadaGate = null; spawnTimer = 0; gateTimer = 0;
-      overlay.style.display = 'none'; document.getElementById('quiz-modal').style.display = 'none';
+      
+      document.getElementById('tue-box').style.display = 'none';
+      overlay.style.display = 'none'; 
+      document.getElementById('quiz-modal').style.display = 'none';
       updateUI(); requestAnimationFrame(gameLoop);
     });
 
@@ -360,19 +406,28 @@
 
     function gameOver(title, text) {
       isRunning = false;
-      overlayTitle.innerText = title; overlayDesc.innerHTML = text;
+      overlayTitle.innerText = title;
+      
+      // Sestavení závěrečného antidopingového reportu pro prezentaci
+      let reportHTML = `${text}<br><br>` +
+        `📊 <b>Antidopingový report kariéry:</b><br>` +
+        `• Profil sportovce: <b>${window.selectedType === 'vytrvalec' ? 'Vytrvalec' : 'Silový sportovec'}</b><br>` +
+        `• Užito zakázaných látek: <b>${stats.dopeCount}x</b><br>` +
+        `• WADA kontroly: <b>${stats.wadaPassed}/${stats.wadaTotal}</b> úspěšně obhájeno<br>` +
+        `• Využito TUE (Výjimek): <b>${stats.tueUsed}x</b><br>` +
+        `• Návštěvy odborníků: Lékař (${stats.doctorCount}), Právník (${stats.lawyerCount})<br><br>` +
+        `💡 <i>Věděl jsi to? Princip striktní odpovědnosti znamená, že sportovec ručí za vše ve svém těle, bez ohledu na to, jak se to tam dostalo[cite: 1].</i>`;
+
+      overlayDesc.innerHTML = reportHTML;
+      athleteArea.style.display = 'none';
       nameInputContainer.style.display = 'none'; 
       startBtn.style.display = 'inline-block'; startBtn.innerText = "HRÁT ZNOVU";
       startLeaderboardBtn.style.display = 'inline-block';
       
-      if (Math.floor(score) > 0) {
-        if (!db) {
-          overlayDesc.innerHTML += "<br><br><i>(Žebříček není aktivní, učitel nenastavil online databázi)</i>";
-        } else {
-          nameInputContainer.style.display = 'block'; 
-          startBtn.style.display = 'none'; 
-          startLeaderboardBtn.style.display = 'none';
-        }
+      if (Math.floor(score) > 0 && db) {
+        nameInputContainer.style.display = 'block'; 
+        startBtn.style.display = 'none'; 
+        startLeaderboardBtn.style.display = 'none';
       }
       overlay.style.display = 'flex';
     }
@@ -380,7 +435,7 @@
     saveScoreBtn.addEventListener('click', () => {
       const name = document.getElementById('playerName').value.trim();
       if (name && db) {
-        push(ref(db, 'scores'), { name: name, score: Math.floor(score), time: Date.now() });
+        push(ref(db, 'scores'), { name: `${name} (${window.selectedType === 'vytrvalec' ? 'Vytrvalec' : 'Silový'})`, score: Math.floor(score), time: Date.now() });
         nameInputContainer.style.display = 'none'; 
         startBtn.style.display = 'inline-block'; 
         startLeaderboardBtn.style.display = 'inline-block'; 
@@ -399,6 +454,12 @@
       document.getElementById('energyVal').innerText = Math.max(0, Math.floor(energy));
       document.getElementById('dopingVal').innerText = Math.min(100, Math.ceil((dopingFrames / maxDopingFrames) * 100));
       document.getElementById('livesVal').innerText = lives;
+      
+      if (hasTUE) {
+        document.getElementById('tue-box').style.display = 'block';
+      } else {
+        document.getElementById('tue-box').style.display = 'none';
+      }
     }
 
     let typingTimer = null;
@@ -412,9 +473,7 @@
           i++;
         } else {
           clearInterval(typingTimer);
-          if (callback) {
-            setTimeout(callback, pauseAfter);
-          }
+          if (callback) { setTimeout(callback, pauseAfter); }
         }
       }, speed);
     }
@@ -430,10 +489,13 @@
 
       if (type === 'wada') {
         titleEl.innerText = "KOMISAŘ WADA";
+        stats.wadaTotal++;
       } else if (type === 'doctor') {
         titleEl.innerText = "SPORTOVNÍ LÉKAŘ";
+        stats.doctorCount++;
       } else if (type === 'lawyer') {
         titleEl.innerText = "MGR. EXNER (PRÁVNÍK)";
+        stats.lawyerCount++;
       }
 
       drawPixelAvatar(type);
@@ -483,6 +545,7 @@
       if (type === 'wada') {
         if (isCorrect) {
           lives--;
+          stats.wadaPassed++;
           if (lives < 0) { isFatal = true; resTitle = "KARIÉRA UKONČENA"; resText = "Došly vám životy/výjimky."; } 
           else { dopingFrames = 0; wadaGate = null; resTitle = "ZACHRÁNĚN"; resText = "Stálo vás to 1 život, štít je čistý."; }
         } else { isFatal = true; resTitle = "POZITIVNÍ NÁLEZ"; resText = `Správná odpověď byla: ${qData.options[correctIndex]}`; }
@@ -495,7 +558,8 @@
       }
 
       if (isFatal) {
-        document.getElementById('quiz-modal').style.display = 'none'; gameOver(resTitle, resText);
+        document.getElementById('quiz-modal').style.display = 'none'; 
+        gameOver("POZITIVNÍ NÁLEZ / TREST", resText);
       } else {
         typeWriterText(qText, `${resTitle} - ${resText}`, 20, 500, () => {
           const btn = document.createElement('button');
@@ -513,14 +577,21 @@
     function spawnItem() {
       const lane = Math.floor(Math.random() * 3); const rand = Math.random();
       let type, imgObj;
-      if (rand < 0.55) { type = 'clean'; imgObj = images.clean[Math.floor(Math.random() * images.clean.length)]; } 
-      else if (rand < 0.85) {
+      if (rand < 0.50) { 
+        type = 'clean'; 
+        imgObj = images.clean[Math.floor(Math.random() * images.clean.length)]; 
+      } else if (rand < 0.78) {
         const p = Math.random();
         if (p < 0.60) { type = 'dope_blue'; imgObj = images.dope_blue; } 
         else if (p < 0.90) { type = 'dope_red'; imgObj = images.dope_red; } 
         else { type = 'dope_bad'; imgObj = images.dope_bad; }
-      } else if (rand < 0.925) { type = 'doctor'; imgObj = images.doctor; } 
-      else { type = 'lawyer'; imgObj = images.lawyer; }
+      } else if (rand < 0.88) { 
+        type = 'doctor'; imgObj = images.doctor; 
+      } else if (rand < 0.95) { 
+        type = 'lawyer'; imgObj = images.lawyer; 
+      } else { 
+        type = 'tue'; imgObj = images.tue; // Vzácný předmět TUE (Štít)
+      }
       
       items.push({ lane: lane, y: -60, type: type, img: imgObj });
     }
@@ -528,19 +599,43 @@
     function update() {
       roadScrollOffset = (roadScrollOffset + speed) % 40;
 
-      energy -= 0.10; 
+      // Úbytek energie podle zvoleného typu sportovce
+      const drainRate = window.selectedType === 'kulturista' ? 0.13 : 0.08;
+      energy -= drainRate; 
+      
       if (dopingFrames > 0) dopingFrames--; 
       score += speed / 10; speed += 0.002; updateUI();
-      if (energy <= 0) { gameOver("VYČERPÁNÍ", `Došla vám energie. Váš výsledek: <b>${Math.floor(score)}</b>`); return; }
+      
+      if (warningTimer > 0) warningTimer--;
 
-      spawnTimer++; if (spawnTimer > 50 - speed*1.2) { spawnItem(); spawnTimer = 0; }
+      if (energy <= 0) { 
+        gameOver("VYČERPÁNÍ SIL", `Došla vám energie během závodu. Váš konečný výsledek: <b>${Math.floor(score)} m</b>`); 
+        return; 
+      }
+
+      spawnTimer++; if (spawnTimer > 45 - speed*1.2) { spawnItem(); spawnTimer = 0; }
       gateTimer++; if (gateTimer > 450 && !wadaGate) { wadaGate = { y: -100 }; gateTimer = 0; }
 
       if (wadaGate) {
         wadaGate.y += speed; 
         if (Math.abs(wadaGate.y - player.y) < 35) {
-          if (dopingFrames > 0) { triggerQuiz('wada'); return; } 
-          else { energy = Math.min(100, energy + 25); wadaGate = null; }
+          if (dopingFrames > 0) {
+            // Aplikace TUE štítu, pokud ho hráč vlastní!
+            if (hasTUE) {
+              hasTUE = false;
+              dopingFrames = 0;
+              wadaGate = null;
+              stats.tueUsed++;
+              warningText = "📜 TUE Uplatněna! Komisař vás na základě výjimky omluvil.";
+              warningTimer = 220;
+            } else {
+              triggerQuiz('wada'); 
+              return; 
+            }
+          } else { 
+            energy = Math.min(100, energy + 25); 
+            wadaGate = null; 
+          }
         } else if (wadaGate.y > canvas.height + 50) { wadaGate = null; }
       }
 
@@ -551,12 +646,43 @@
         const targetX = lanes[item.lane];
         if (Math.abs(item.y - player.y) < 40) {
           if (Math.abs(targetX - player.x) < 35) {
-            if (item.type === 'clean') { energy = Math.min(100, energy + 12); } 
-            else if (item.type === 'dope_red') { energy = Math.min(100, energy + 45); dopingFrames = Math.min(maxDopingFrames, dopingFrames + 900); } 
-            else if (item.type === 'dope_blue') { energy = Math.min(100, energy + 20); dopingFrames = Math.min(maxDopingFrames, dopingFrames + 300); } 
-            else if (item.type === 'dope_bad') { energy -= 20; dopingFrames = Math.min(maxDopingFrames, dopingFrames + 600); } 
-            else if (item.type === 'doctor') { items.splice(i, 1); triggerQuiz('doctor'); return; } 
-            else if (item.type === 'lawyer') { items.splice(i, 1); triggerQuiz('lawyer'); return; }
+            
+            const isHeavy = window.selectedType === 'kulturista';
+            
+            if (item.type === 'clean') { 
+              energy = Math.min(100, energy + (isHeavy ? 15 : 12)); 
+            } 
+            else if (item.type === 'dope_red') { 
+              energy = Math.min(100, energy + 45); 
+              dopingFrames = Math.min(maxDopingFrames, dopingFrames + 900); 
+              stats.dopeCount++;
+              warningText = "⚠️ Princip striktní odpovědnosti: Za látky v těle ručíš ty!";
+              warningTimer = 180;
+            } 
+            else if (item.type === 'dope_blue') { 
+              energy = Math.min(100, energy + 20); 
+              dopingFrames = Math.min(maxDopingFrames, dopingFrames + 300); 
+              stats.dopeCount++;
+            } 
+            else if (item.type === 'dope_bad') { 
+              energy -= 20; 
+              dopingFrames = Math.min(maxDopingFrames, dopingFrames + 600); 
+              stats.dopeCount++;
+              warningText = "❌ Kontaminovaný doplněk! Ztráta energie a pozitivní nález.";
+              warningTimer = 180;
+            } 
+            else if (item.type === 'doctor') { 
+              items.splice(i, 1); triggerQuiz('doctor'); return; 
+            } 
+            else if (item.type === 'lawyer') { 
+              items.splice(i, 1); triggerQuiz('lawyer'); return; 
+            } 
+            else if (item.type === 'tue') {
+              hasTUE = true;
+              warningText = "📜 Získal jsi Terapeutickou výjimku (TUE)! Štít proti WADA aktivní.";
+              warningTimer = 220;
+            }
+
             items.splice(i, 1); continue;
           }
         }
@@ -570,25 +696,19 @@
       let sideCol = '#1a1a26';
 
       if (score >= 1000 && score < 2500) {
-        roadBg = '#8b0000'; 
-        lineCol = '#ffffe0';
-        sideCol = '#550000';
+        roadBg = '#8b0000'; lineCol = '#ffffe0'; sideCol = '#550000';
       } else if (score >= 2500) {
-        roadBg = '#2e8b57'; 
-        lineCol = '#adff2f';
-        sideCol = '#004d1a';
+        roadBg = '#2e8b57'; lineCol = '#adff2f'; sideCol = '#004d1a';
       }
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      // 1. Pozadí a okraje cesty
       ctx.fillStyle = sideCol;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       ctx.fillStyle = roadBg;
       ctx.fillRect(60, 0, canvas.width - 120, canvas.height);
 
-      // 2. Detaily na cestě
       ctx.strokeStyle = lineCol; 
       ctx.lineWidth = 4; 
       ctx.setLineDash([25, 20]);
@@ -604,7 +724,6 @@
       ctx.fillRect(60, 0, 8, canvas.height);
       ctx.fillRect(canvas.width - 68, 0, 8, canvas.height);
 
-      // 3. WADA Brána
       if (wadaGate) {
         ctx.fillStyle = '#000000'; 
         ctx.fillRect(60, wadaGate.y - 25, canvas.width - 120, 50);
@@ -613,59 +732,61 @@
         ctx.fillText("🚧 KONTROLA WADA 🚧", canvas.width / 2, wadaGate.y + 8);
       }
       
-      // 4. Vykreslení předmětů
       const imgSize = 48; 
       for (let item of items) {
         const itemX = lanes[item.lane];
         if (item.img && item.img.complete && item.img.naturalHeight !== 0) {
           ctx.drawImage(item.img, itemX - imgSize/2, item.y - imgSize/2, imgSize, imgSize);
         } else {
-          ctx.fillStyle = '#FFFFFF'; 
+          ctx.fillStyle = item.type === 'tue' ? '#00ffcc' : '#FFFFFF'; 
           ctx.beginPath(); ctx.arc(itemX, item.y, imgSize/2, 0, Math.PI * 2); ctx.fill();
         }
       }
 
-      // 5. Vykreslení animovaného hráče (panáček s běžeckou animací a změnou barvy podle dopingu)
+      // Animovaný hráč
       const targetX = lanes[currentLane];
       player.x += (targetX - player.x) * 0.2; 
 
       const isDoping = dopingFrames > 0;
-      const shirtColor = isDoping ? '#000000' : '#000AFF'; // Modré nebo černé oblečení
+      const shirtColor = isDoping ? '#000000' : '#000AFF'; 
       const pantsColor = isDoping ? '#222222' : '#003366';
       
       const legOffset = Math.sin(score * 0.3) * 8;
       const armOffset = Math.cos(score * 0.3) * 8;
 
-      // Hlava
       ctx.beginPath();
       ctx.arc(player.x, player.y - 25, 10, 0, Math.PI * 2);
       ctx.fillStyle = '#ffdbac';
       ctx.fill();
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = '#000000';
-      ctx.stroke();
+      ctx.lineWidth = 2; ctx.strokeStyle = '#000000'; ctx.stroke();
 
-      // Trup (tričko) - barva se mění podle dopingu
       ctx.fillStyle = shirtColor;
       ctx.fillRect(player.x - 10, player.y - 15, 20, 22);
 
-      // Nohy s animací běhu
-      ctx.strokeStyle = pantsColor;
-      ctx.lineWidth = 4;
+      ctx.strokeStyle = pantsColor; ctx.lineWidth = 4;
       ctx.beginPath();
-      ctx.moveTo(player.x - 5, player.y + 7);
-      ctx.lineTo(player.x - 8 + legOffset, player.y + 25);
-      ctx.moveTo(player.x + 5, player.y + 7);
-      ctx.lineTo(player.x + 8 - legOffset, player.y + 25);
+      ctx.moveTo(player.x - 5, player.y + 7); ctx.lineTo(player.x - 8 + legOffset, player.y + 25);
+      ctx.moveTo(player.x + 5, player.y + 7); ctx.lineTo(player.x + 8 - legOffset, player.y + 25);
       ctx.stroke();
 
-      // Ruce s animací běhu
       ctx.beginPath();
-      ctx.moveTo(player.x - 10, player.y - 10);
-      ctx.lineTo(player.x - 15 - armOffset, player.y + 2);
-      ctx.moveTo(player.x + 10, player.y - 10);
-      ctx.lineTo(player.x + 15 + armOffset, player.y + 2);
+      ctx.moveTo(player.x - 10, player.y - 10); ctx.lineTo(player.x - 15 - armOffset, player.y + 2);
+      ctx.moveTo(player.x + 10, player.y - 10); ctx.lineTo(player.x + 15 + armOffset, player.y + 2);
       ctx.stroke();
+
+      // Vykreslení varovné hlášky na obrazovce (princip striktní odpovědnosti / TUE)
+      if (warningTimer > 0) {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
+        ctx.fillRect(30, 80, canvas.width - 60, 50);
+        ctx.strokeStyle = '#ffcc00';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(30, 80, canvas.width - 60, 50);
+        
+        ctx.fillStyle = '#ffcc00';
+        ctx.font = 'bold 13px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(warningText, canvas.width / 2, markerY = 111);
+      }
     }
 
     function gameLoop() { if (isRunning && !isQuizActive) { update(); draw(); requestAnimationFrame(gameLoop); } }
