@@ -69,7 +69,6 @@
     #startLeaderboardBtn { background: var(--adv-black); border: 2px solid var(--adv-gold); }
     #startLeaderboardBtn:hover { background: #333; }
 
-    /* Výběr sportovce */
     .athlete-select {
       display: flex; gap: 10px; justify-content: center; margin-bottom: 15px;
     }
@@ -80,7 +79,6 @@
       border-color: var(--adv-blue); background: #eef2ff; font-weight: bold;
     }
     
-    /* RUNEKSPEAKÉ DIALOGOVÉ OKNO */
     .rs-dialogue-box {
       background: #0d0d1a;
       border: 4px solid var(--adv-gold);
@@ -181,7 +179,6 @@
     <div class="modal-content">
       <h2 id="overlayTitle">Projekt: Čistý sport</h2>
       
-      <!-- Výběr typu sportovce -->
       <div id="athlete-selection-area">
         <p style="text-align:center; font-weight:bold; margin-bottom:8px;">Vyber si herní profil sportovce:</p>
         <div class="athlete-select">
@@ -197,7 +194,7 @@
       <div id="overlayDesc">
         <b>Pravidla a mechaniky:</b><br>
         • <b>Swipe doleva/doprava:</b> Uhýbání na trati.<br>
-        • <b>Princip striktní odpovědnosti:</b> Za obsah v těle zodpovídáš ty! Pozor na neověřené doplňky.<br>
+        • <b>Princip striktní odpovědnosti:</b> Za obsah v těle zodpovídáš ty[cite: 1]! Pozor na neověřené doplňky.<br>
         • 📜 <b>Terapeutická výjimka (TUE):</b> Unikátní dokument, který tě jednou zachrání před trestem WADA.<br>
         • 🩺 Lékař & 💼 Právník: Pomohou ti získat život nebo očistit krev, pokud odpovíš správně na otázku z antidopingu.
       </div>
@@ -275,10 +272,8 @@
     images.dope_bad.src = 'dope_black.png'; 
     images.doctor.src = 'doctor.png';
     images.lawyer.src = 'lawyer.png';
-    // Pokud uživatel nemá obrázek tue.png, vykreslí se text/zástupný symbol automaticky
     images.tue.src = 'tue.png'; 
 
-    // Výběr sportovce (Globální funkce pro HTML)
     window.selectedType = 'vytrvalec';
     window.setAthlete = function(type) {
       window.selectedType = type;
@@ -342,12 +337,10 @@
     let isRunning = false; let isQuizActive = false;
     let score = 0; let energy = 100; let speed = 6; let lives = 3;
     let dopingFrames = 0; const maxDopingFrames = 900; 
-    let hasTUE = false; // Terapeutická výjimka (štít)
+    let hasTUE = false;
 
-    // Herní statistiky pro závěrečný edukativní report
     let stats = { dopeCount: 0, wadaTotal: 0, wadaPassed: 0, doctorCount: 0, lawyerCount: 0, tueUsed: 0 };
     
-    // Varovná hláška na plátně (Princip striktní odpovědnosti)
     let warningText = "";
     let warningTimer = 0;
 
@@ -384,8 +377,11 @@
       const threshold = 35;
 
       if (Math.abs(diffX) > Math.abs(diffY)) {
-        if (diffX > threshold && currentLane < 2) { currentLane++; } 
-        else if (diffX < -threshold && currentLane > 0) { currentLane--; }
+        if (diffX > threshold && currentLane < 2) {
+          currentLane++;
+        } else if (diffX < -threshold && currentLane > 0) {
+          currentLane--;
+        }
       }
     }, { passive: false });
 
@@ -408,7 +404,6 @@
       isRunning = false;
       overlayTitle.innerText = title;
       
-      // Sestavení závěrečného antidopingového reportu pro prezentaci
       let reportHTML = `${text}<br><br>` +
         `📊 <b>Antidopingový report kariéry:</b><br>` +
         `• Profil sportovce: <b>${window.selectedType === 'vytrvalec' ? 'Vytrvalec' : 'Silový sportovec'}</b><br>` +
@@ -590,7 +585,7 @@
       } else if (rand < 0.95) { 
         type = 'lawyer'; imgObj = images.lawyer; 
       } else { 
-        type = 'tue'; imgObj = images.tue; // Vzácný předmět TUE (Štít)
+        type = 'tue'; imgObj = images.tue; 
       }
       
       items.push({ lane: lane, y: -60, type: type, img: imgObj });
@@ -599,7 +594,6 @@
     function update() {
       roadScrollOffset = (roadScrollOffset + speed) % 40;
 
-      // Úbytek energie podle zvoleného typu sportovce
       const drainRate = window.selectedType === 'kulturista' ? 0.13 : 0.08;
       energy -= drainRate; 
       
@@ -620,7 +614,6 @@
         wadaGate.y += speed; 
         if (Math.abs(wadaGate.y - player.y) < 35) {
           if (dopingFrames > 0) {
-            // Aplikace TUE štítu, pokud ho hráč vlastní!
             if (hasTUE) {
               hasTUE = false;
               dopingFrames = 0;
@@ -656,20 +649,22 @@
               energy = Math.min(100, energy + 45); 
               dopingFrames = Math.min(maxDopingFrames, dopingFrames + 900); 
               stats.dopeCount++;
-              warningText = "⚠️ Princip striktní odpovědnosti: Za látky v těle ručíš ty!";
-              warningTimer = 180;
+              warningText = "⚠️ DOPING: Vzal sis zakázanou látku! Striktní odpovědnost – ručíš za to ty[cite: 1]!";
+              warningTimer = 220;
             } 
             else if (item.type === 'dope_blue') { 
               energy = Math.min(100, energy + 20); 
               dopingFrames = Math.min(maxDopingFrames, dopingFrames + 300); 
               stats.dopeCount++;
+              warningText = "⚠️ DOPING: Přijal jsi stimulant! Zodpovídáš za vše v těle[cite: 1].";
+              warningTimer = 220;
             } 
             else if (item.type === 'dope_bad') { 
               energy -= 20; 
               dopingFrames = Math.min(maxDopingFrames, dopingFrames + 600); 
               stats.dopeCount++;
-              warningText = "❌ Kontaminovaný doplněk! Ztráta energie a pozitivní nález.";
-              warningTimer = 180;
+              warningText = "❌ Kontaminovaný doplněk! Pozitivní nález – ručíš za to ty[cite: 1]!";
+              warningTimer = 220;
             } 
             else if (item.type === 'doctor') { 
               items.splice(i, 1); triggerQuiz('doctor'); return; 
@@ -743,7 +738,6 @@
         }
       }
 
-      // Animovaný hráč
       const targetX = lanes[currentLane];
       player.x += (targetX - player.x) * 0.2; 
 
@@ -774,18 +768,17 @@
       ctx.moveTo(player.x + 10, player.y - 10); ctx.lineTo(player.x + 15 + armOffset, player.y + 2);
       ctx.stroke();
 
-      // Vykreslení varovné hlášky na obrazovce (princip striktní odpovědnosti / TUE)
       if (warningTimer > 0) {
         ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
-        ctx.fillRect(30, 80, canvas.width - 60, 50);
+        ctx.fillRect(30, 80, canvas.width - 60, 55);
         ctx.strokeStyle = '#ffcc00';
         ctx.lineWidth = 2;
-        ctx.strokeRect(30, 80, canvas.width - 60, 50);
+        ctx.strokeRect(30, 80, canvas.width - 60, 55);
         
         ctx.fillStyle = '#ffcc00';
-        ctx.font = 'bold 13px Arial';
+        ctx.font = 'bold 12px Arial';
         ctx.textAlign = 'center';
-        ctx.fillText(warningText, canvas.width / 2, 111);
+        ctx.fillText(warningText, canvas.width / 2, 112);
       }
     }
 
