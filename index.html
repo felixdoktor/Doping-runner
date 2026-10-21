@@ -193,8 +193,8 @@
 
       <div id="overlayDesc">
         <b>Pravidla a mechaniky:</b><br>
-        • <b>Swipe doleva/doprava:</b> Uhýbání na trati.<br>
-        • <b>Princip striktní odpovědnosti:</b> Za obsah v těle zodpovídáš ty! Pozor na neověřené doplňky.<br>
+        • <b>Swipe doleva/doprava:</b> Uhýbání na trati[cite: 1].<br>
+        • <b>Princip striktní odpovědnosti:</b> Za obsah v těle zodpovídáš ty[cite: 1]! Pozor na neověřené doplňky.<br>
         • 📜 <b>Terapeutická výjimka (TUE):</b> Unikátní dokument, který tě jednou zachrání před trestem WADA.<br>
         • 🩺 Lékař & 💼 Právník: Pomohou ti získat život nebo očistit krev, pokud odpovíš správně na otázku z antidopingu.
       </div>
@@ -358,8 +358,8 @@
     let warningText = "";
     let warningTimer = 0;
 
-    // Široké dráhy [110, 270, 430]
-    const lanes = [110, 270, 430]; 
+    // VRÁCENO NA ZMENŠENÉ DRÁHY [210, 270, 330], které přesně pasují na vygenerované pruhy na obrázku
+    const lanes = [210, 270, 330]; 
     let currentLane = 1;
     const player = { x: lanes[1], targetX: lanes[1], y: 820, radius: 26 };
     
@@ -425,7 +425,7 @@
         `• WADA kontroly: <b>${stats.wadaPassed}/${stats.wadaTotal}</b> úspěšně obhájeno<br>` +
         `• Využito TUE (Výjimek): <b>${stats.tueUsed}x</b><br>` +
         `• Návštěvy odborníků: Lékař (${stats.doctorCount}), Právník (${stats.lawyerCount})<br><br>` +
-        `💡 <i>Věděl jsi to? Princip striktní odpovědnosti znamená, že sportovec ručí za vše ve svém těle, bez ohledu na to, jak se to tam dostalo.</i>`;
+        `💡 <i>Věděl jsi to? Princip striktní odpovědnosti znamená, že sportovec ručí za vše ve svém těle, bez ohledu na to, jak se to tam dostalo[cite: 1].</i>`;
 
       overlayDesc.innerHTML = reportHTML;
       athleteArea.style.display = 'none';
@@ -686,21 +686,21 @@
               energy = Math.min(100, energy + 45); 
               dopingFrames = Math.min(maxDopingFrames, dopingFrames + 900); 
               stats.dopeCount++;
-              warningText = "⚠️ DOPING: Vzal sis zakázanou látku! Striktní odpovědnost – ručíš za to ty!";
+              warningText = "⚠️ DOPING: Vzal sis zakázanou látku! Striktní odpovědnost – ručíš za to ty[cite: 1]!";
               warningTimer = 220;
             } 
             else if (item.type === 'dope_blue') { 
               energy = Math.min(100, energy + 20); 
               dopingFrames = Math.min(maxDopingFrames, dopingFrames + 300); 
               stats.dopeCount++;
-              warningText = "⚠️ DOPING: Přijal jsi stimulant! Zodpovídáš za vše v těle.";
+              warningText = "⚠️ DOPING: Přijal jsi stimulant! Zodpovídáš za vše v těle[cite: 1].";
               warningTimer = 220;
             } 
             else if (item.type === 'dope_bad') { 
               energy -= 20; 
               dopingFrames = Math.min(maxDopingFrames, dopingFrames + 600); 
               stats.dopeCount++;
-              warningText = "❌ Kontaminovaný doplněk! Pozitivní nález – ručíš za to ty!";
+              warningText = "❌ Kontaminovaný doplněk! Pozitivní nález – ručíš za to ty[cite: 1]!";
               warningTimer = 220;
             } 
             else if (item.type === 'doctor') { 
@@ -773,9 +773,9 @@
 
       if (wadaGate) {
         ctx.fillStyle = '#000000'; 
-        ctx.fillRect(60, wadaGate.y - 25, canvas.width - 120, 50);
+        ctx.fillRect(170, wadaGate.y - 25, 200, 50);
         ctx.fillStyle = '#FFFFFF'; 
-        ctx.font = "bold 20px Arial"; ctx.textAlign = "center";
+        ctx.font = "bold 18px Arial"; ctx.textAlign = "center";
         ctx.fillText("🚧 KONTROLA WADA 🚧", canvas.width / 2, wadaGate.y + 8);
       }
       
