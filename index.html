@@ -43,7 +43,7 @@
       box-shadow: 0 10px 30px rgba(0,0,0,0.15);
     }
     
-    canvas { background: #111; display: block; width: 100%; height: 100%; touch-action: none; }
+    canvas { background: #222; display: block; width: 100%; height: 100%; touch-action: none; }
     
     .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -173,9 +173,9 @@
         <b>Ovládání:</b> Přejetí prstem (swipe) doleva nebo doprava (Šipky na PC).<br><br>
         🍏 💧 <b>Čistá výživa:</b> +12 % energie.<br>
         💊 🔵 ⚫ <b>Doping:</b> Rychlá energie, ale drží se v krvi (🔴 až 15s)!<br>
-        🩺 <b>Lékař:</b> 3D RPG cutscéna o +1 život (Max 5).<br>
+        🩺 <b>Lékař:</b> RPG cutscéna o +1 život (Max 5).<br>
         💼 <b>Právník:</b> Cutscéna s Panem Exnerem o smazání dopingu.<br>
-        🚧 <b>Kontrola WADA:</b> Kvízová cutscéna. Prostředí se mění (Město ➔ Stadion ➔ Les)!
+        🚧 <b>Kontrola WADA:</b> Kvízová cutscéna. Scéna se mění (Město ➔ Stadion ➔ Les)!
       </div>
       
       <div id="name-input-container" style="display: none;">
@@ -307,17 +307,13 @@
     let score = 0; let energy = 100; let speed = 6; let lives = 3;
     let dopingFrames = 0; const maxDopingFrames = 900; 
     
-    // PSEUDO-3D PROJEKCE A DRÁHY
-    const horizonY = 320;
-    const bottomY = 880;
-    const topLanesX = [240, 270, 300];     // Sbíhají se nahoře u horizontu
-    const bottomLanesX = [90, 270, 450];  // Široké dole u hráče
-    
+    // 2D Dráhy (X pozice)
+    const lanes = [110, 270, 430]; 
     let currentLane = 1;
-    // Pozice hráče v 3D prostoru (z = 1.0 je v popředí)
-    const player = { lane: 1, z: 1.0, radius: 28 };
+    const player = { x: lanes[1], targetX: lanes[1], y: 820, radius: 26 };
     
     let items = []; let wadaGate = null; let spawnTimer = 0; let gateTimer = 0;
+    let roadScrollOffset = 0; // Pro animaci detailů na cestě
 
     let touchStartX = 0; let touchStartY = 0;
 
@@ -527,38 +523,37 @@
       } else if (rand < 0.925) { type = 'doctor'; imgObj = images.doctor; } 
       else { type = 'lawyer'; imgObj = images.lawyer; }
       
-      // Startují v dálce (z = 0.0)
-      items.push({ lane: lane, z: 0.0, type: type, img: imgObj });
+      items.push({ lane: lane, y: -60, type: type, img: imgObj });
     }
 
     function update() {
+      // Posun textury cesty pro efekt rychlosti
+      roadScrollOffset = (roadScrollOffset + speed) % 40;
+
       energy -= 0.10; 
       if (dopingFrames > 0) dopingFrames--; 
       score += speed / 10; speed += 0.002; updateUI();
       if (energy <= 0) { gameOver("VYČERPÁNÍ", `Došla vám energie. Váš výsledek: <b>${Math.floor(score)}</b>`); return; }
 
       spawnTimer++; if (spawnTimer > 50 - speed*1.2) { spawnItem(); spawnTimer = 0; }
-      gateTimer++; if (gateTimer > 450 && !wadaGate) { wadaGate = { z: 0.0 }; gateTimer = 0; }
-
-      // Rychlost přibližování objektů v 3D prostoru
-      const zSpeed = 0.008 + (speed * 0.0003);
+      gateTimer++; if (gateTimer > 450 && !wadaGate) { wadaGate = { y: -100 }; gateTimer = 0; }
 
       if (wadaGate) {
-        wadaGate.z += zSpeed;
-        // Když brána dorazí k hráči (z ~ 1.0)
-        if (wadaGate.z >= 0.95 && wadaGate.z <= 1.05) {
+        wadaGate.y += speed; 
+        if (Math.abs(wadaGate.y - player.y) < 35) {
           if (dopingFrames > 0) { triggerQuiz('wada'); return; } 
           else { energy = Math.min(100, energy + 25); wadaGate = null; }
-        } else if (wadaGate.z > 1.1) { wadaGate = null; }
+        } else if (wadaGate.y > canvas.height + 50) { wadaGate = null; }
       }
 
       for (let i = items.length - 1; i >= 0; i--) {
         const item = items[i]; 
-        item.z += zSpeed; 
+        item.y += speed; 
         
-        // Kolize s hráčem, když item dorazí do z = 1.0
-        if (item.z >= 0.90 && item.z <= 1.10) {
-          if (item.lane === currentLane) {
+        // Kolize hráče s předmětem
+        const targetX = lanes[item.lane];
+        if (Math.abs(item.y - player.y) < 40) {
+          if (Math.abs(targetX - player.x) < 35) {
             if (item.type === 'clean') { energy = Math.min(100, energy + 12); } 
             else if (item.type === 'dope_red') { energy = Math.min(100, energy + 45); dopingFrames = Math.min(maxDopingFrames, dopingFrames + 900); } 
             else if (item.type === 'dope_blue') { energy = Math.min(100, energy + 20); dopingFrames = Math.min(maxDopingFrames, dopingFrames + 300); } 
@@ -568,95 +563,79 @@
             items.splice(i, 1); continue;
           }
         }
-        if (item.z > 1.2) items.splice(i, 1); 
+        if (item.y > canvas.height + 50) items.splice(i, 1); 
       }
     }
 
     function draw() {
-      // ZJIŠTĚNÍ AKTUÁLNÍHO BIOMU PODLE SKÓRE
-      let biome = 'city';
-      let groundColor = '#1e1e2f';
-      let roadColor = '#2b2b3d';
-      let sideColor = '#3a3a52';
+      // URČENÍ AKTUÁLNÍHO BIOMU PODLE SKÓRE
+      let roadBg = '#2c2c3e'; // Město
+      let lineCol = '#ffffff';
+      let sideCol = '#1a1a26';
 
       if (score >= 1000 && score < 2500) {
-        biome = 'stadium';
-        groundColor = '#8b0000'; // Vínová tartanová dráha
-        roadColor = '#a52a2a';
-        sideColor = '#cd5c5c';
+        roadBg = '#8b0000'; // Stadion (tartan)
+        lineCol = '#ffffe0';
+        sideCol = '#550000';
       } else if (score >= 2500) {
-        biome = 'forest';
-        groundColor = '#228b22'; // Lesní zeleň
-        roadColor = '#2e8b57';
-        sideColor = '#006400';
+        roadBg = '#2e8b57'; // Les (přírodní cesta)
+        lineCol = '#adff2f';
+        sideCol = '#004d1a';
       }
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      // 1. Vykreslení pozadí a perspektivní silnice
-      ctx.fillStyle = groundColor;
-      ctx.fillRect(0, horizonY, canvas.width, canvas.height - horizonY);
+      // 1. Pozadí a okraje cesty
+      ctx.fillStyle = sideCol;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Silnice (trojúhelník zužující se k horizontu)
-      ctx.fillStyle = roadColor;
-      ctx.beginPath();
-      ctx.moveTo(topLanesX[0] - 30, horizonY);
-      ctx.lineTo(topLanesX[2] + 30, horizonY);
-      ctx.lineTo(bottomLanesX[2] + 50, bottomY);
-      ctx.lineTo(bottomLanesX[0] - 50, bottomY);
-      ctx.fill();
+      ctx.fillStyle = roadBg;
+      ctx.fillRect(60, 0, canvas.width - 120, canvas.height);
 
-      // Dělicí čáry dráhy v perspektivě
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.4)"; 
-      ctx.lineWidth = 3;
-      for (let i = 0; i < 3; i++) {
-        ctx.beginPath();
-        ctx.moveTo(topLanesX[i], horizonY);
-        ctx.lineTo(bottomLanesX[i], bottomY);
-        ctx.stroke();
-      }
+      // 2. Detaily na cestě (pohyblivé středové čáry pro efekt rychlosti)
+      ctx.strokeStyle = lineCol; 
+      ctx.lineWidth = 4; 
+      ctx.setLineDash([25, 20]);
+      ctx.lineDashOffset = -roadScrollOffset;
 
-      // 2. WADA Brána v perspektivě
+      ctx.beginPath(); 
+      ctx.moveTo(200, 0); ctx.lineTo(200, canvas.height); 
+      ctx.moveTo(340, 0); ctx.lineTo(340, canvas.height);
+      ctx.stroke(); 
+      ctx.setLineDash([]); // Reset čar
+
+      // Okrajové obrubníky cesty
+      ctx.fillStyle = "rgba(255,255,255,0.2)";
+      ctx.fillRect(60, 0, 8, canvas.height);
+      ctx.fillRect(canvas.width - 68, 0, 8, canvas.height);
+
+      // 3. WADA Brána
       if (wadaGate) {
-        const gw = Math.max(10, wadaGate.z * canvas.width);
-        const gh = Math.max(5, wadaGate.z * 150);
-        const gy = horizonY + (bottomY - horizonY) * wadaGate.z - gh/2;
-        
         ctx.fillStyle = '#000000'; 
-        ctx.fillRect(canvas.width/2 - gw/2, gy, gw, gh);
+        ctx.fillRect(60, wadaGate.y - 25, canvas.width - 120, 50);
         ctx.fillStyle = '#FFFFFF'; 
-        ctx.font = `bold ${Math.max(10, Math.floor(wadaGate.z * 22))}px Arial`; 
-        ctx.textAlign = "center";
-        ctx.fillText("WADA KONTROLA", canvas.width / 2, gy + gh/2 + 6);
+        ctx.font = "bold 22px Arial"; ctx.textAlign = "center";
+        ctx.fillText("🚧 KONTROLA WADA 🚧", canvas.width / 2, wadaGate.y + 8);
       }
-
-      // 3. Vykreslení předmětů s 3D škálováním
-      // Seřadíme předměty podle z (od nejvzdálenějších po nejbližší, aby se správně překrývaly)
-      const sortedItems = [...items].sort((a, b) => a.z - b.z);
-
-      for (let item of sortedItems) {
-        const topX = topLanesX[item.lane];
-        const botX = bottomLanesX[item.lane];
-        const x = topX + (botX - topX) * item.z;
-        const y = horizonY + (bottomY - horizonY) * item.z;
-        
-        // Velikost se zvětšuje s blížícím se z
-        const size = Math.max(15, item.z * 70);
-
+      
+      // 4. Vykreslení předmětů
+      const imgSize = 48; 
+      for (let item of items) {
+        const itemX = lanes[item.lane];
         if (item.img && item.img.complete && item.img.naturalHeight !== 0) {
-          ctx.drawImage(item.img, x - size/2, y - size/2, size, size);
+          ctx.drawImage(item.img, itemX - imgSize/2, item.y - imgSize/2, imgSize, imgSize);
         } else {
           ctx.fillStyle = '#FFFFFF'; 
-          ctx.beginPath(); ctx.arc(x, y, size/2, 0, Math.PI * 2); ctx.fill();
+          ctx.beginPath(); ctx.arc(itemX, item.y, imgSize/2, 0, Math.PI * 2); ctx.fill();
         }
       }
 
-      // 4. Vykreslení hráče v popředí (podle aktuální dráhy)
-      const targetPlayerX = bottomLanesX[currentLane];
-      player.x += (targetPlayerX - player.x) * 0.2; // Plynulý přechod mezi dráhami
+      // 5. Vykreslení hráče
+      const targetPlayerX = lanes[currentLane];
+      player.x += (targetPlayerX - player.x) * 0.2; 
       
       ctx.beginPath(); 
-      ctx.arc(player.x, bottomY - 30, player.radius, 0, Math.PI * 2);
+      ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
       ctx.fillStyle = dopingFrames > 0 ? '#000000' : '#D7C08C'; 
       ctx.fill();
       ctx.lineWidth = 4; ctx.strokeStyle = '#FFFFFF'; ctx.stroke();
