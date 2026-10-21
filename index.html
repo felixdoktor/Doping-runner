@@ -193,8 +193,8 @@
 
       <div id="overlayDesc">
         <b>Pravidla a mechaniky:</b><br>
-        • <b>Swipe doleva/doprava:</b> Uhýbání na trati[cite: 1].<br>
-        • <b>Princip striktní odpovědnosti:</b> Za obsah v těle zodpovídáš ty[cite: 1]! Pozor na neověřené doplňky.<br>
+        • <b>Swipe doleva/doprava:</b> Uhýbání na trati.<br>
+        • <b>Princip striktní odpovědnosti:</b> Za obsah v těle zodpovídáš ty! Pozor na neověřené doplňky.<br>
         • 📜 <b>Terapeutická výjimka (TUE):</b> Unikátní dokument, který tě jednou zachrání před trestem WADA.<br>
         • 🩺 Lékař & 💼 Právník: Pomohou ti získat život nebo očistit krev, pokud odpovíš správně na otázku z antidopingu.
       </div>
@@ -255,6 +255,7 @@
       catch (e) { console.error("Chyba databáze:", e); }
     }
 
+    // Načtení herních obrázků včetně 6 modulárních částí pozadí
     const images = {
       clean: [new Image(), new Image()],
       dope_red: new Image(),
@@ -262,7 +263,13 @@
       dope_bad: new Image(),
       doctor: new Image(),
       lawyer: new Image(),
-      tue: new Image()
+      tue: new Image(),
+      bgCity: new Image(),
+      bgCityToForest: new Image(),
+      bgForest: new Image(),
+      bgForestToStadium: new Image(),
+      bgStadium: new Image(),
+      bgStadiumToCity: new Image()
     };
 
     images.clean[0].src = 'clean1.png';
@@ -273,6 +280,14 @@
     images.doctor.src = 'doctor.png';
     images.lawyer.src = 'lawyer.png';
     images.tue.src = 'tue.png'; 
+
+    // Přiřazení souborů k modulárním pozadím
+    images.bgCity.src = 'sector_city.png';
+    images.bgCityToForest.src = 'trans_city_to_forest.png';
+    images.bgForest.src = 'sector_forest.png';
+    images.bgForestToStadium.src = 'trans_forest_to_stadium.png';
+    images.bgStadium.src = 'sector_stadium.png';
+    images.bgStadiumToCity.src = 'trans_stadium_to_city.png';
 
     window.selectedType = 'vytrvalec';
     window.setAthlete = function(type) {
@@ -340,8 +355,6 @@
     let hasTUE = false;
 
     let stats = { dopeCount: 0, wadaTotal: 0, wadaPassed: 0, doctorCount: 0, lawyerCount: 0, tueUsed: 0 };
-    
-    // Počitadlo pro celkový výskyt nápovědných prvků během hry podle aktuálního skóre
     let helpItemsSpawnedCount = 0;
 
     let warningText = "";
@@ -352,9 +365,6 @@
     const player = { x: lanes[1], targetX: lanes[1], y: 820, radius: 26 };
     
     let items = []; let wadaGate = null; let spawnTimer = 0; let gateTimer = 0;
-    let roadScrollOffset = 0;
-
-    let touchStartX = 0; let touchStartY = 0;
 
     window.addEventListener('keydown', (e) => {
       if (!isRunning || isQuizActive) return;
@@ -369,6 +379,7 @@
       touchStartY = e.touches[0].clientY;
     }, { passive: false });
 
+    let touchStartX = 0; let touchStartY = 0;
     canvas.addEventListener('touchend', (e) => {
       e.preventDefault();
       if (!isRunning || isQuizActive) return;
@@ -415,7 +426,7 @@
         `• WADA kontroly: <b>${stats.wadaPassed}/${stats.wadaTotal}</b> úspěšně obhájeno<br>` +
         `• Využito TUE (Výjimek): <b>${stats.tueUsed}x</b><br>` +
         `• Návštěvy odborníků: Lékař (${stats.doctorCount}), Právník (${stats.lawyerCount})<br><br>` +
-        `💡 <i>Věděl jsi to? Princip striktní odpovědnosti znamená, že sportovec ručí za vše ve svém těle, bez ohledu na to, jak se to tam dostalo[cite: 1].</i>`;
+        `💡 <i>Věděl jsi to? Princip striktní odpovědnosti znamená, že sportovec ručí za vše ve svém těle, bez ohledu na to, jak se to tam dostalo.</i>`;
 
       overlayDesc.innerHTML = reportHTML;
       athleteArea.style.display = 'none';
@@ -577,8 +588,6 @@
       const lane = Math.floor(Math.random() * 3); 
       const rand = Math.random();
       
-      // Určení maximálního počtu nápovědných prvků podle aktuální vzdálenosti (skóre)
-      // 0 - 2500m: max 5x | 2500 - 5000m: max 3x | od 5000m dále (vč. 10000m+): max 1x
       let maxHelpAllowed = 1;
       if (score < 2500) {
         maxHelpAllowed = 5;
@@ -618,8 +627,6 @@
     }
 
     function update() {
-      roadScrollOffset = (roadScrollOffset + speed) % 40;
-
       const drainRate = window.selectedType === 'kulturista' ? 0.13 : 0.08;
       energy -= drainRate; 
       
@@ -680,21 +687,21 @@
               energy = Math.min(100, energy + 45); 
               dopingFrames = Math.min(maxDopingFrames, dopingFrames + 900); 
               stats.dopeCount++;
-              warningText = "⚠️ DOPING: Vzal sis zakázanou látku! Striktní odpovědnost – ručíš za to ty[cite: 1]!";
+              warningText = "⚠️ DOPING: Vzal sis zakázanou látku! Striktní odpovědnost – ručíš za to ty!";
               warningTimer = 220;
             } 
             else if (item.type === 'dope_blue') { 
               energy = Math.min(100, energy + 20); 
               dopingFrames = Math.min(maxDopingFrames, dopingFrames + 300); 
               stats.dopeCount++;
-              warningText = "⚠️ DOPING: Přijal jsi stimulant! Zodpovídáš za vše v těle[cite: 1].";
+              warningText = "⚠️ DOPING: Přijal jsi stimulant! Zodpovídáš za vše v těle.";
               warningTimer = 220;
             } 
             else if (item.type === 'dope_bad') { 
               energy -= 20; 
               dopingFrames = Math.min(maxDopingFrames, dopingFrames + 600); 
               stats.dopeCount++;
-              warningText = "❌ Kontaminovaný doplněk! Pozitivní nález – ručíš za to ty[cite: 1]!";
+              warningText = "❌ Kontaminovaný doplněk! Pozitivní nález – ručíš za to ty!";
               warningTimer = 220;
             } 
             else if (item.type === 'doctor') { 
@@ -716,40 +723,56 @@
       }
     }
 
-    function draw() {
-      let roadBg = '#2c2c3e'; 
-      let lineCol = '#ffffff';
-      let sideCol = '#1a1a26';
+    // Funkce pro výběr aktuálního modulárního pozadí podle skóre (Loop trasy)
+    function getModularBackground(currentScore) {
+      // Celková délka jednoho kompletního okruhu trasy v metrech
+      const loopLength = 9000; 
+      let pos = currentScore % loopLength;
 
-      if (score >= 1000 && score < 2500) {
-        roadBg = '#8b0000'; lineCol = '#ffffe0'; sideCol = '#550000';
-      } else if (score >= 2500) {
-        roadBg = '#2e8b57'; lineCol = '#adff2f'; sideCol = '#004d1a';
+      // Rozdělení 9000 metrů na 6 bloků (3 sektory + 3 přechody)
+      if (pos < 2000) {
+        return { img: images.bgCity, progress: pos / 2000 };
+      } else if (pos < 2500) {
+        return { img: images.bgCityToForest, progress: (pos - 2000) / 500 };
+      } else if (pos < 4500) {
+        return { img: images.bgForest, progress: (pos - 2500) / 2000 };
+      } else if (pos < 5000) {
+        return { img: images.bgForestToStadium, progress: (pos - 4500) / 500 };
+      } else if (pos < 7000) {
+        return { img: images.bgStadium, progress: (pos - 5000) / 2000 };
+      } else {
+        return { img: images.bgStadiumToCity, progress: (pos - 7000) / 2000 };
       }
+    }
 
+    function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      ctx.fillStyle = sideCol;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      // Vykreslení modálního pozadí z 6 nahraných obrázků
+      let bgData = getModularBackground(score);
+      let bgImg = bgData.img;
+      let progress = bgData.progress;
 
-      ctx.fillStyle = roadBg;
-      ctx.fillRect(60, 0, canvas.width - 120, canvas.height);
+      if (bgImg && bgImg.complete && bgImg.naturalHeight > 0) {
+        let imgH = bgImg.naturalHeight;
+        let imgW = bgImg.naturalWidth;
+        let visibleH = canvas.height;
+        let maxSourceY = imgH - visibleH;
+        if (maxSourceY < 0) maxSourceY = 0;
+        
+        let sourceY = progress * maxSourceY;
 
-      ctx.strokeStyle = lineCol; 
-      ctx.lineWidth = 4; 
-      ctx.setLineDash([25, 20]);
-      ctx.lineDashOffset = -roadScrollOffset;
+        ctx.drawImage(bgImg, 
+          0, sourceY, imgW, visibleH, 
+          0, 0, canvas.width, canvas.height
+        );
+      } else {
+        // Fallback, pokud se obrázek ještě načítá
+        ctx.fillStyle = '#2c2c3e';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
 
-      ctx.beginPath(); 
-      ctx.moveTo(200, 0); ctx.lineTo(200, canvas.height); 
-      ctx.moveTo(340, 0); ctx.lineTo(340, canvas.height);
-      ctx.stroke(); 
-      ctx.setLineDash([]); 
-
-      ctx.fillStyle = "rgba(255,255,255,0.2)";
-      ctx.fillRect(60, 0, 8, canvas.height);
-      ctx.fillRect(canvas.width - 68, 0, 8, canvas.height);
-
+      // WADA Brána
       if (wadaGate) {
         ctx.fillStyle = '#000000'; 
         ctx.fillRect(60, wadaGate.y - 25, canvas.width - 120, 50);
@@ -758,6 +781,7 @@
         ctx.fillText("🚧 KONTROLA WADA 🚧", canvas.width / 2, wadaGate.y + 8);
       }
       
+      // Vykreslení předmětů
       const imgSize = 48; 
       for (let item of items) {
         const itemX = lanes[item.lane];
@@ -769,6 +793,7 @@
         }
       }
 
+      // Animovaný hráč
       const targetX = lanes[currentLane];
       player.x += (targetX - player.x) * 0.2; 
 
@@ -799,6 +824,7 @@
       ctx.moveTo(player.x + 10, player.y - 10); ctx.lineTo(player.x + 15 + armOffset, player.y + 2);
       ctx.stroke();
 
+      // Varovná hláška na obrazovce
       if (warningTimer > 0) {
         ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
         ctx.fillRect(30, 80, canvas.width - 60, 55);
