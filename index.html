@@ -183,10 +183,10 @@
         <p style="text-align:center; font-weight:bold; margin-bottom:8px;">Vyber si herní profil sportovce:</p>
         <div class="athlete-select">
           <div class="athlete-card selected" id="cardVytrvalec" onclick="setAthlete('vytrvalec')">
-            <b>🏃 Vytrvalec</b><br><span style="font-size:11px; color:#555;">Stabilní výdej energie, pomalejší růst dopingu.</span>
+            <b>🏃 Vytrvalec</b><br><span style="font-size:11px; color:#555;">Stabilní výdej energie, pomalejší růst dopingu[cite: 1].</span>
           </div>
           <div class="athlete-card" id="cardKulturista" onclick="setAthlete('kulturista')">
-            <b>🏋️ Silový sportovec</b><br><span style="font-size:11px; color:#555;">Rychlejší úbytek sil, ale doplňky dávají víc energie.</span>
+            <b>🏋️ Silový sportovec</b><br><span style="font-size:11px; color:#555;">Rychlejší úbytek sil, ale doplňky dávají víc energie[cite: 1].</span>
           </div>
         </div>
       </div>
@@ -195,8 +195,8 @@
         <b>Pravidla a mechaniky:</b><br>
         • <b>Swipe doleva/doprava:</b> Uhýbání na trati[cite: 1].<br>
         • <b>Princip striktní odpovědnosti:</b> Za obsah v těle zodpovídáš ty[cite: 1]! Pozor na neověřené doplňky.<br>
-        • 📜 <b>Terapeutická výjimka (TUE):</b> Unikátní dokument, který tě jednou zachrání před trestem WADA.<br>
-        • 🩺 Lékař & 💼 Právník: Pomohou ti získat život nebo očistit krev, pokud odpovíš správně na otázku z antidopingu.
+        • 📜 <b>Terapeutická výjimka (TUE):</b> Unikátní dokument, který tě jednou zachrání před trestem WADA[cite: 1].<br>
+        • 🩺 Lékař & 💼 Právník: Pomohou ti získat život nebo očistit krev, pokud odpovíš správně na otázku z antidopingu[cite: 1].
       </div>
       
       <div id="name-input-container" style="display: none;">
@@ -352,13 +352,15 @@
     let dopingFrames = 0; const maxDopingFrames = 900; 
     let hasTUE = false;
 
+    // Proměnná pro plynulý pixelový posun pozadí (pohybuje se přesně se speed)
+    let worldScrollY = 0;
+
     let stats = { dopeCount: 0, wadaTotal: 0, wadaPassed: 0, doctorCount: 0, lawyerCount: 0, tueUsed: 0 };
     let helpItemsSpawnedCount = 0;
 
     let warningText = "";
     let warningTimer = 0;
 
-    // VRÁCENO NA ZMENŠENÉ DRÁHY [210, 270, 330], které přesně pasují na vygenerované pruhy na obrázku
     const lanes = [210, 270, 330]; 
     let currentLane = 1;
     const player = { x: lanes[1], targetX: lanes[1], y: 820, radius: 26 };
@@ -402,6 +404,7 @@
       isRunning = true; isQuizActive = false;
       score = 0; energy = 100; dopingFrames = 0; speed = 6; lives = 3; currentLane = 1; 
       hasTUE = false;
+      worldScrollY = 0; // Reset pozice pozadí
       helpItemsSpawnedCount = 0;
       stats = { dopeCount: 0, wadaTotal: 0, wadaPassed: 0, doctorCount: 0, lawyerCount: 0, tueUsed: 0 };
       items = []; wadaGate = null; spawnTimer = 0; gateTimer = 0;
@@ -419,7 +422,7 @@
       overlayTitle.innerText = title;
       
       let reportHTML = `${text}<br><br>` +
-        `📊 <b>Antidopingový report kariéry:</b><br>` +
+        `📊 <b>Antidopingový report kariéry[cite: 1]:</b><br>` +
         `• Profil sportovce: <b>${window.selectedType === 'vytrvalec' ? 'Vytrvalec' : 'Silový sportovec'}</b><br>` +
         `• Užito zakázaných látek: <b>${stats.dopeCount}x</b><br>` +
         `• WADA kontroly: <b>${stats.wadaPassed}/${stats.wadaTotal}</b> úspěšně obhájeno<br>` +
@@ -511,11 +514,11 @@
 
       let introText = "";
       if (type === 'wada') {
-        introText = "Pozor! Zastavila vás hlídka dopingové kontroly. Váš vzorek vykazuje stopy dopingu. Komisař požaduje okamžité vysvětlení!";
+        introText = "Pozor! Zastavila vás hlídka dopingové kontroly. Váš vzorek vykazuje stopy dopingu. Komisař požaduje okamžité vysvětlení[cite: 1]!";
       } else if (type === 'doctor') {
-        introText = "Navštívili jste sportovního lékaře na preventivní prohlídku. Lékař si s vámi chce popovídat o pravidlech zdravého sportu.";
+        introText = "Navštívili jste sportovního lékaře na preventivní prohlídku. Lékař si s vámi chce popovídat o pravidlech zdravého sportu[cite: 1].";
       } else if (type === 'lawyer') {
-        introText = "Setkali jste se s Mgr. Exnerem za účelem právní konzultace. Pan Exner vám chce položit zkušební otázku.";
+        introText = "Setkali jste se s Mgr. Exnerem za účelem právní konzultace. Pan Exner vám chce položit zkušební otázku[cite: 1].";
       }
 
       typeWriterText(qText, introText, 20, 500, () => {
@@ -555,14 +558,14 @@
         if (isCorrect) {
           lives--;
           stats.wadaPassed++;
-          if (lives < 0) { isFatal = true; resTitle = "KARIÉRA UKONČENA"; resText = "Došly vám životy/výjimky."; } 
-          else { dopingFrames = 0; wadaGate = null; resTitle = "ZACHRÁNĚN"; resText = "Stálo vás to 1 život, štít je čistý."; }
+          if (lives < 0) { isFatal = true; resTitle = "KARIÉRA UKONČENA"; resText = "Došly vám životy/výjimky[cite: 1]."; } 
+          else { dopingFrames = 0; wadaGate = null; resTitle = "ZACHRÁNĚN"; resText = "Stálo vás to 1 život, štít je čistý[cite: 1]."; }
         } else { isFatal = true; resTitle = "POZITIVNÍ NÁLEZ"; resText = `Správná odpověď byla: ${qData.options[correctIndex]}`; }
       } else if (type === 'doctor') {
-        if (isCorrect) { lives = Math.min(5, lives + 1); resTitle = "VÝBORNĚ"; resText = "+1 život od lékaře."; } 
+        if (isCorrect) { lives = Math.min(5, lives + 1); resTitle = "VÝBORNĚ"; resText = "+1 život od lékaře[cite: 1]."; } 
         else { resTitle = "ŠKODA"; resText = `Správná odpověď byla: ${qData.options[correctIndex]}`; }
       } else if (type === 'lawyer') {
-        if (isCorrect) { dopingFrames = 0; resTitle = "OČIŠTĚN"; resText = "Váš doping byl vymazán z krve!"; } 
+        if (isCorrect) { dopingFrames = 0; resTitle = "OČIŠTĚN"; resText = "Váš doping byl vymazán z krve[cite: 1]!"; } 
         else { resTitle = "ZAMÍTNUTO"; resText = `Správná odpověď byla: ${qData.options[correctIndex]}`; }
       }
 
@@ -630,7 +633,12 @@
       energy -= drainRate; 
       
       if (dopingFrames > 0) dopingFrames--; 
-      score += speed / 10; speed += 0.002; updateUI();
+      
+      // Posun světa (pozadí se teď hýbe úplně plynule podle rychlosti 'speed')
+      worldScrollY += speed;
+      score += speed / 10; 
+      speed += 0.002; 
+      updateUI();
       
       if (warningTimer > 0) warningTimer--;
 
@@ -656,7 +664,7 @@
               dopingFrames = 0;
               wadaGate = null;
               stats.tueUsed++;
-              warningText = "📜 TUE Uplatněna! Komisař vás na základě výjimky omluvil.";
+              warningText = "📜 TUE Uplatněna! Komisař vás na základě výjimky omluvil[cite: 1].";
               warningTimer = 220;
             } else {
               triggerQuiz('wada'); 
@@ -711,7 +719,7 @@
             } 
             else if (item.type === 'tue') {
               hasTUE = true;
-              warningText = "📜 Získal jsi Terapeutickou výjimku (TUE)! Štít proti WADA aktivní.";
+              warningText = "📜 Získal jsi Terapeutickou výjimku (TUE)! Štít proti WADA aktivní[cite: 1].";
               warningTimer = 220;
             }
 
@@ -722,32 +730,35 @@
       }
     }
 
-    function getModularBackground(currentScore) {
-      const loopLength = 9000; 
-      let pos = currentScore % loopLength;
+    // Modulární výběr pozadí řízený plynulým posunem světa (worldScrollY)
+    function getModularBackground(scrollY) {
+      // Každý sektor / přechod tvoří úsek o velikosti např. 2500 pixelů posunu
+      const sectorStep = 2500;
+      const totalLoop = sectorStep * 6;
+      let pos = scrollY % totalLoop;
 
-      if (pos < 2000) {
-        return { img: images.bgCity, progress: pos / 2000, flip: false };
-      } else if (pos < 2500) {
-        return { img: images.bgCityToForest, progress: (pos - 2000) / 500, flip: true }; 
-      } else if (pos < 4500) {
-        return { img: images.bgForest, progress: (pos - 2500) / 2000, flip: false };
-      } else if (pos < 5000) {
-        return { img: images.bgForestToStadium, progress: (pos - 4500) / 500, flip: true }; 
-      } else if (pos < 7000) {
-        return { img: images.bgStadium, progress: (pos - 5000) / 2000, flip: false };
+      if (pos < sectorStep) {
+        return { img: images.bgCity, progress: pos / sectorStep, flip: false };
+      } else if (pos < sectorStep * 2) {
+        return { img: images.bgCityToForest, progress: (pos - sectorStep) / sectorStep, flip: false };
+      } else if (pos < sectorStep * 3) {
+        return { img: images.bgForest, progress: (pos - sectorStep * 2) / sectorStep, flip: false };
+      } else if (pos < sectorStep * 4) {
+        return { img: images.bgForestToStadium, progress: (pos - sectorStep * 3) / sectorStep, flip: false };
+      } else if (pos < sectorStep * 5) {
+        return { img: images.bgStadium, progress: (pos - sectorStep * 4) / sectorStep, flip: false };
       } else {
-        return { img: images.bgStadiumToCity, progress: (pos - 7000) / 2000, flip: true }; 
+        return { img: images.bgStadiumToCity, progress: (pos - sectorStep * 5) / sectorStep, flip: false };
       }
     }
 
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      let bgData = getModularBackground(score);
+      // Získání aktuálního dílu pozadí podle worldScrollY
+      let bgData = getModularBackground(worldScrollY);
       let bgImg = bgData.img;
       let progress = bgData.progress;
-      let flip = bgData.flip;
 
       if (bgImg && bgImg.complete && bgImg.naturalHeight > 0) {
         let imgH = bgImg.naturalHeight;
@@ -757,10 +768,6 @@
         if (maxSourceY < 0) maxSourceY = 0;
         
         let sourceY = progress * maxSourceY;
-
-        if (flip) {
-          sourceY = maxSourceY - sourceY;
-        }
 
         ctx.drawImage(bgImg, 
           0, sourceY, imgW, visibleH, 
@@ -854,14 +861,15 @@
       });
     }
 
+    document.getElementById('closeLeaderboardDialog') // (pomocný prvek)
     document.getElementById('closeLeaderboardBtn').addEventListener('click', () => { 
       document.getElementById('leaderboard-modal').style.display = 'none'; 
     });
 
     document.getElementById('teacher-reset').addEventListener('click', () => {
-      const pwd = prompt("Zadej heslo učitele pro vymazání žebříčku:");
+      const pwd = prompt("Zadej heslo učitele pro vymazání žebříčku[cite: 1]:");
       if (pwd === TEACHER_PASSWORD) {
-         if (db) { remove(ref(db, 'scores')); alert("Žebříček byl vymazán."); }
+         if (db) { remove(ref(db, 'scores')); alert("Žebříček byl vymazán[cite: 1]."); }
       } else if (pwd !== null) { alert("Špatné heslo!"); }
     });
 
