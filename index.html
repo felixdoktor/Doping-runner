@@ -193,7 +193,7 @@
 
       <div id="overlayDesc">
         <b>Pravidla a mechaniky:</b><br>
-        • <b>Swipe doleva/doprava:</b> Uhýbání na trati.<br>
+        • <b>Swipe doleva/doprava:</b> Uhýbání na trati[cite: 1].<br>
         • <b>Princip striktní odpovědnosti:</b> Za obsah v těle zodpovídáš ty[cite: 1]! Pozor na neověřené doplňky.<br>
         • 📜 <b>Terapeutická výjimka (TUE):</b> Unikátní dokument, který tě jednou zachrání před trestem WADA.<br>
         • 🩺 Lékař & 💼 Právník: Pomohou ti získat život nebo očistit krev, pokud odpovíš správně na otázku z antidopingu.
@@ -341,6 +341,9 @@
 
     let stats = { dopeCount: 0, wadaTotal: 0, wadaPassed: 0, doctorCount: 0, lawyerCount: 0, tueUsed: 0 };
     
+    // Počitadlo pro celkový výskyt nápovědných prvků během hry podle aktuálního skóre
+    let helpItemsSpawnedCount = 0;
+
     let warningText = "";
     let warningTimer = 0;
 
@@ -389,6 +392,7 @@
       isRunning = true; isQuizActive = false;
       score = 0; energy = 100; dopingFrames = 0; speed = 6; lives = 3; currentLane = 1; 
       hasTUE = false;
+      helpItemsSpawnedCount = 0;
       stats = { dopeCount: 0, wadaTotal: 0, wadaPassed: 0, doctorCount: 0, lawyerCount: 0, tueUsed: 0 };
       items = []; wadaGate = null; spawnTimer = 0; gateTimer = 0;
       
@@ -570,22 +574,44 @@
     }
 
     function spawnItem() {
-      const lane = Math.floor(Math.random() * 3); const rand = Math.random();
+      const lane = Math.floor(Math.random() * 3); 
+      const rand = Math.random();
+      
+      // Určení maximálního počtu nápovědných prvků podle aktuální vzdálenosti (skóre)
+      // 0 - 2500m: max 5x | 2500 - 5000m: max 3x | od 5000m dále (vč. 10000m+): max 1x
+      let maxHelpAllowed = 1;
+      if (score < 2500) {
+        maxHelpAllowed = 5;
+      } else if (score < 5000) {
+        maxHelpAllowed = 3;
+      } else {
+        maxHelpAllowed = 1;
+      }
+      
       let type, imgObj;
-      if (rand < 0.50) { 
-        type = 'clean'; 
-        imgObj = images.clean[Math.floor(Math.random() * images.clean.length)]; 
-      } else if (rand < 0.78) {
-        const p = Math.random();
-        if (p < 0.60) { type = 'dope_blue'; imgObj = images.dope_blue; } 
-        else if (p < 0.90) { type = 'dope_red'; imgObj = images.dope_red; } 
-        else { type = 'dope_bad'; imgObj = images.dope_bad; }
-      } else if (rand < 0.88) { 
-        type = 'doctor'; imgObj = images.doctor; 
-      } else if (rand < 0.95) { 
-        type = 'lawyer'; imgObj = images.lawyer; 
-      } else { 
-        type = 'tue'; imgObj = images.tue; 
+      const canSpawnHelp = helpItemsSpawnedCount < maxHelpAllowed && rand > 0.55;
+
+      if (canSpawnHelp) {
+        const subRand = Math.random();
+        if (subRand < 0.45) { 
+          type = 'doctor'; imgObj = images.doctor; 
+        } else if (subRand < 0.90) { 
+          type = 'lawyer'; imgObj = images.lawyer; 
+        } else { 
+          type = 'tue'; imgObj = images.tue; 
+        }
+        helpItemsSpawnedCount++;
+      } else {
+        const subRand2 = Math.random();
+        if (subRand2 < 0.55) { 
+          type = 'clean'; 
+          imgObj = images.clean[Math.floor(Math.random() * images.clean.length)]; 
+        } else {
+          const p = Math.random();
+          if (p < 0.60) { type = 'dope_blue'; imgObj = images.dope_blue; } 
+          else if (p < 0.90) { type = 'dope_red'; imgObj = images.dope_red; } 
+          else { type = 'dope_bad'; imgObj = images.dope_bad; }
+        }
       }
       
       items.push({ lane: lane, y: -60, type: type, img: imgObj });
@@ -608,7 +634,12 @@
       }
 
       spawnTimer++; if (spawnTimer > 45 - speed*1.2) { spawnItem(); spawnTimer = 0; }
-      gateTimer++; if (gateTimer > 450 && !wadaGate) { wadaGate = { y: -100 }; gateTimer = 0; }
+      
+      gateTimer++; 
+      if (gateTimer > 450 && !wadaGate) { 
+        wadaGate = { y: -100 }; 
+        gateTimer = 0; 
+      }
 
       if (wadaGate) {
         wadaGate.y += speed; 
