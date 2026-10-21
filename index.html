@@ -358,7 +358,8 @@
     let warningText = "";
     let warningTimer = 0;
 
-    const lanes = [210, 270, 330]; 
+    // PŮVODNÍ ŠIROKÉ DRÁHY: [110, 270, 430]
+    const lanes = [110, 270, 430]; 
     let currentLane = 1;
     const player = { x: lanes[1], targetX: lanes[1], y: 820, radius: 26 };
     
@@ -728,15 +729,15 @@
       if (pos < 2000) {
         return { img: images.bgCity, progress: pos / 2000, flip: false };
       } else if (pos < 2500) {
-        return { img: images.bgCityToForest, progress: (pos - 2000) / 500, flip: true }; // Otočeno o 180°
+        return { img: images.bgCityToForest, progress: (pos - 2000) / 500, flip: true }; 
       } else if (pos < 4500) {
         return { img: images.bgForest, progress: (pos - 2500) / 2000, flip: false };
       } else if (pos < 5000) {
-        return { img: images.bgForestToStadium, progress: (pos - 4500) / 500, flip: true }; // Otočeno o 180°
+        return { img: images.bgForestToStadium, progress: (pos - 4500) / 500, flip: true }; 
       } else if (pos < 7000) {
         return { img: images.bgStadium, progress: (pos - 5000) / 2000, flip: false };
       } else {
-        return { img: images.bgStadiumToCity, progress: (pos - 7000) / 2000, flip: true }; // Otočeno o 180°
+        return { img: images.bgStadiumToCity, progress: (pos - 7000) / 2000, flip: true }; 
       }
     }
 
@@ -759,13 +760,12 @@
 
         ctx.save();
         if (flip) {
-          // Pokud je přechod obrácený, otočíme ho v plátně vzhůru nohama
           ctx.translate(canvas.width, canvas.height);
           ctx.rotate(Math.PI);
-          // Přepočítáme sourceY pro obrácené vykreslení
           sourceY = maxSourceY - sourceY;
         }
 
+        // Pozadí se roztáhne přes celou šířku plátna (0 až canvas.width)
         ctx.drawImage(bgImg, 
           0, sourceY, imgW, visibleH, 
           0, 0, canvas.width, canvas.height
@@ -778,9 +778,9 @@
 
       if (wadaGate) {
         ctx.fillStyle = '#000000'; 
-        ctx.fillRect(170, wadaGate.y - 25, 200, 50);
+        ctx.fillRect(60, wadaGate.y - 25, canvas.width - 120, 50);
         ctx.fillStyle = '#FFFFFF'; 
-        ctx.font = "bold 18px Arial"; ctx.textAlign = "center";
+        ctx.font = "bold 20px Arial"; ctx.textAlign = "center";
         ctx.fillText("🚧 KONTROLA WADA 🚧", canvas.width / 2, wadaGate.y + 8);
       }
       
