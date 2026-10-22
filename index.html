@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clean Runner: Fair Play - Úvod</title>
+  <style>
+    :root {
+      --adv-blue: #000AFF;
+      --adv-gold: #D7C08C;
+      --adv-black: #000000;
+      --adv-white: #FFFFFF;
+    }
+
+    body {
+      margin: 0; background: #f4f4f9; color: var(--adv-black);
+      font-family: Arial, sans-serif; 
+      display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+      min-height: 100vh; padding: 20px; box-sizing: border-box;
+    }
+
+    .container {
+      background: var(--adv-white); border-top: 10px solid var(--adv-blue); border-radius: 8px;
+      padding: 30px; max-width: 600px; width: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      text-align: center; margin-top: 20px; box-sizing: border-box;
+    }
+
+    h1 {
+      color: var(--adv-blue); font-weight: bold; text-transform: uppercase;
+      letter-spacing: 1px; margin-bottom: 5px; font-size: 26px;
+    }
+
+    .subtitle {
+      font-size: 14px; color: #666; margin-bottom: 25px; font-weight: bold;
+    }
+
+    .section-title {
+      color: var(--adv-blue); font-size: 16px; font-weight: bold; margin-top: 20px; margin-bottom: 8px; text-align: left;
+      border-bottom: 2px solid #eee; padding-bottom: 4px; text-transform: uppercase;
+    }
+
+    p, ul {
+      font-size: 14px; line-height: 1.5; color: #333; text-align: left; margin-bottom: 15px;
+    }
+
+    ul { padding-left: 20px; }
+    li { margin-bottom: 6px; }
+
+    /* Styl pro interaktivní ikonu/obrazovku hry s odkazem */
+    .game-banner {
+      margin: 25px 0;
+      position: relative;
+      border: 4px solid var(--adv-black);
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: pointer;
+      display: inline-block;
+      transition: transform 0.2s, box-shadow 0.2s;
+      background: #000;
+      max-width: 300px;
+      width: 100%;
+    }
+
+    .game-banner:hover {
+      transform: scale(1.03);
+      box-shadow: 0 8px 25px rgba(0,10,255,0.3);
+    }
+
+    .game-banner img {
+      width: 100%;
+      display: block;
+      opacity: 0.85;
+      transition: opacity 0.2s;
+    }
+
+    .game-banner:hover img {
+      opacity: 1;
+    }
+
+    .play-overlay {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: rgba(0, 0, 0, 0.4);
+      color: var(--adv-white);
+      font-weight: bold;
+    }
+
+    .play-btn-large {
+      background: var(--adv-blue); color: var(--adv-white); border: none; padding: 14px 30px;
+      font-size: 18px; font-weight: bold; border-radius: 30px; cursor: pointer; text-decoration: none;
+      box-shadow: 0 4px 15px rgba(0,10,255,0.4); display: inline-block; transition: background 0.2s;
+      text-transform: uppercase;
+    }
+    .play-btn-large:hover { background: var(--adv-black); }
+
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Clean Runner: Fair Play</h1>
+    <div class="subtitle">Vzdělávací retro videohra o čistém sportu a antidopingu</div>
+
+    <div class="section-title">📌 Účel a zaměření hry</div>
+    <p>
+      <b>Clean Runner</b> je interaktivní arkádová hra vytvořená za účelem širší osvěty o pravidlech fair play, ochraně zdraví sportovců a fungování světového antidopingu (WADA). Hra hravou formou seznamuje hráče s reálnými situacemi, kterým čelí vrcholoví sportovci.
+    </p>
+
+    <div class="section-title">⚙️ Klíčové herní mechaniky a pravidla</div>
+    <ul>
+      <li><b>Princip striktní odpovědnosti:</b> Sportovec nese plnou odpovědnost za každou látku, která se ocitne v jeho těle, bez ohledu na zavinění.</li>
+      <li><b>Terapeutická výjimka (TUE):</b> Unikátní dokument, který může sportovci v kritické chvíli zachránit kariéru před trestem.</li>
+      <li><b>Odborná pomoc:</b> Během závodu lze potkat sportovního lékaře nebo právníka, kteří pomohou se správnými odpověďmi v antidopingovém kvízu.</li>
+      <li><b>Profily sportovců:</b> Možnost volby mezi vytrvalcem (stabilní výdej sil) a silovým sportovcem (specifická regenerace).</li>
+    </ul>
+
+    <div class="section-title">🎮 Spustit hru</div>
+    <p style="text-align: center; margin-bottom: 5px;">Kliknutím na obrázek nebo tlačítko níže vstoupíš do závodu:</p>
+
+    <!-- Klikací náhledová ikona vedoucí do hry -->
+    <a href="game.html" class="game-banner">
+      <img src="sector_city.png" alt="Clean Runner Ikona Hry">
+      <div class="play-overlay">
+        <span style="font-size: 22px; text-shadow: 2px 2px 4px #000;">▶ SPUSTIT HRU</span>
+      </div>
+    </a>
+
+    <br>
+    <a href="game.html" class="play-btn-large">VSTOUPIT DO ZÁVODU ➔</a>
+  </div>
+
+</body>
+</html>
