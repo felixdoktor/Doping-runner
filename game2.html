@@ -27,7 +27,7 @@
 
     #desk-container {
       position: relative; background: #3b2f2f; border: 8px solid #221a1a; border-radius: 6px;
-      width: 100%; max-width: 800px; height: 600px; box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+      width: 100%; max-width: 850px; height: 620px; box-shadow: 0 15px 35px rgba(0,0,0,0.6);
       display: flex; flex-direction: column; justify-content: space-between; padding: 15px; box-sizing: border-box;
       margin-top: 10px;
     }
@@ -37,7 +37,6 @@
       padding: 8px 12px; border-radius: 4px; font-size: 13px; font-weight: bold; border: 1px solid #555;
     }
 
-    /* Pracovní plocha a záložky příruček */
     .workspace {
       position: relative; flex-grow: 1; margin: 10px 0; background: #2c2222;
       border-radius: 4px; display: flex; justify-content: space-between; padding: 15px; box-sizing: border-box; gap: 15px;
@@ -49,7 +48,7 @@
 
     .document {
       background: var(--paper-bg); border: 2px solid #d1cbbd; border-radius: 4px;
-      width: 100%; max-width: 360px; padding: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+      width: 100%; max-width: 380px; padding: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
       font-family: Arial, sans-serif; box-sizing: border-box;
     }
 
@@ -64,14 +63,14 @@
 
     .doc-row span { font-weight: bold; color: #000; }
 
-    /* Panel příruček na stole */
     .manual-pane {
       flex: 1; background: #221c1c; border: 2px solid #443333; border-radius: 4px; padding: 10px;
       display: flex; flex-direction: column; color: #ccc; font-family: Arial, sans-serif; font-size: 11px;
+      max-height: 480px;
     }
 
     .manual-tabs {
-      display: flex; gap: 5px; margin-bottom: 8px; border-bottom: 1px solid #444; padding-bottom: 5px;
+      display: flex; gap: 5px; margin-bottom: 8px; border-bottom: 1px solid #444; padding-bottom: 5px; flex-shrink: 0;
     }
 
     .tab-btn {
@@ -84,10 +83,9 @@
     }
 
     .manual-table { width: 100%; border-collapse: collapse; font-size: 11px; }
-    .manual-table th, .manual-table td { border: 1px solid #333; padding: 4px 6px; text-align: left; }
-    .manual-table th { background: #262020; color: var(--adv-gold); }
+    .manual-table th, .manual-table td { border: 1px solid #333; padding: 5px 6px; text-align: left; }
+    .manual-table th { background: #262020; color: var(--adv-gold); position: sticky; top: 0; }
 
-    /* Ovládací panel */
     .control-panel {
       display: flex; gap: 10px; justify-content: center; align-items: center;
     }
@@ -120,7 +118,7 @@
   <div id="desk-container">
     <div class="hud-bar">
       <div>Služba: <span id="dayVal">Den 1</span></div>
-      <div>Zkontrolováno: <span id="checkedVal">0</span>/5</div>
+      <div>Zkontrolováno: <span id="checkedVal">0</span>/6</div>
       <div>Chyby: <span id="errorsVal">0</span>/3 ❌</div>
     </div>
 
@@ -137,7 +135,7 @@
           <div class="doc-row">Nalezená látka ve vzorku: <span id="docSubstance" style="color: #b71c1c;">Látka</span></div>
           <div class="doc-row">Předložená TUE: <span id="docTueStatus">Žádná</span></div>
           
-          <div class="doc-row" style="margin-top: 12px; border-top: 1px dashed #ccc; padding-top: 8px; background: #f0eee6; padding: 6px; border-radius: 3px;">
+          <div class="doc-row" style="margin-top: 10px; border-top: 1px dashed #ccc; padding-top: 6px; background: #f0eee6; padding: 6px; border-radius: 3px;">
             <b>Pomocník inspektora:</b><br>
             <label><input type="checkbox" id="checkBanned"> ⛔ Zakázaná látka</label><br>
             <label><input type="checkbox" id="checkAllowed"> ✔ Povolená látka</label><br>
@@ -149,18 +147,17 @@
       <!-- Pravá strana: Referenční příručky na stole -->
       <div class="manual-pane">
         <div class="manual-tabs">
-          <button class="tab-btn active" onclick="switchTab('substances')">Seznam látek</button>
+          <button class="tab-btn active" onclick="switchTab('substances')">Seznam látek (Katalog)</button>
           <button class="tab-btn" onclick="switchTab('tueRegistry')">WADA TUE Registr</button>
         </div>
         <div id="tabSubstances" class="manual-content">
           <table class="manual-table">
-            <tr><th>Látka / Supplement</th><th>Status</th></tr>
-            <tr><td>Vitamin C</td><td style="color:#2e7d32">Povolená</td></tr>
-            <tr><td>Proteinový prášek</td><td style="color:#2e7d32">Povolená</td></tr>
-            <tr><td>Kofetinové tablety</td><td style="color:#2e7d32">Povolená</td></tr>
-            <tr><td>Testosteron</td><td style="color:#c62828">Zakázaná</td></tr>
-            <tr><td>Efedrin</td><td style="color:#c62828">Zakázaná</td></tr>
-            <tr><td>Nandrolon</td><td style="color:#c62828">Zakázaná</td></tr>
+            <thead>
+              <tr><th>Látka / Produkt</th><th>Status</th></tr>
+            </thead>
+            <tbody id="substanceTableBody">
+              <!-- Dynamicky naplněno katalogem -->
+            </tbody>
           </table>
         </div>
         <div id="tabTueRegistry" class="manual-content" style="display: none;">
@@ -182,7 +179,7 @@
   <div id="modalOverlay" class="modal-overlay">
     <div class="modal-content">
       <h2 id="modalTitle">Směna inspektora začíná</h2>
-      <p id="modalDesc">Prověřujte vzorky sportovců. Porovnávejte nalezené látky se Seznamem zakázaných látek a předložené TUE dokumenty s WADA Registrem. Chybné schválení podvodníka nebo zamítnutí čistého sportovce se trestá!</p>
+      <p id="modalDesc">Katalog látek se rozrostl. Musíte pečlivě prohledávat tabulku v příručce, porovnávat položky a ověřovat platnost TUE v registru. Pozor na chyby!</p>
       <button class="stamp-btn" id="modalBtn" onclick="startGame()" style="background: var(--adv-blue); color: white; width: 100%; margin-top: 10px;">ZAHÁJIT SMĚNU</button>
     </div>
   </div>
@@ -192,24 +189,55 @@
     let checkedCount = 0;
     let errorsCount = 0;
     const maxErrors = 3;
-    let targetToCheck = 5;
+    let targetToCheck = 6;
 
     let currentAthlete = null;
-    let activeValidTueIds = []; // Pole ID sportovců, kteří mají dnes platnou TUE v registru
+    let activeValidTueIds = [];
 
-    const firstNames = ["Jan", "Petr", "Eva", "Lucie", "Tomáš", "Klára", "David", "Marie"];
-    const lastNames = ["Novák", "Svoboda", "Dvořák", "Černý", "Procházková", "Kučerová", "Veselý"];
-    const sports = ["Atletika", "Cyklistika", "Vzpírání", "Plavání", "Kulturistika"];
+    const firstNames = ["Jan", "Petr", "Eva", "Lucie", "Tomáš", "Klára", "David", "Marie", "Jakub", "Tereza"];
+    const lastNames = ["Novák", "Svoboda", "Dvořák", "Černý", "Procházková", "Kučerová", "Veselý", "Horáková", "Němec"];
+    const sports = ["Atletika", "Cyklistika", "Vzpírání", "Plavání", "Kulturistika", "Sportovní střelba", "Biatlon"];
     
-    // Kompletní katalog látek s jejich oficiálním statusem
+    // Rozsáhlý katalog látek pro poctivé hledání
     const catalogSubstances = [
-      { name: "Vitamin C", status: "Povolená" },
-      { name: "Proteinový prášek", status: "Povolená" },
+      { name: "Vitamin C (Kyselina askorbová)", status: "Povolená" },
+      { name: "Proteinový prášek WPC", status: "Povolená" },
       { name: "Kofetinové tablety", status: "Povolená" },
-      { name: "Testosteron", status: "Zakázaná" },
-      { name: "Efedrin", status: "Zakázaná" },
-      { name: "Nandrolon", status: "Zakázaná" }
+      { name: "Kreatin monohydrát", status: "Povolená" },
+      { name: "BCAA aminokyseliny", status: "Povolená" },
+      { name: "L-Glutamin", status: "Povolená" },
+      { name: "Omega-3 rybí tuk", status: "Povolená" },
+      { name: "Magnézium chelát", status: "Povolená" },
+      { name: "Zinek l-methionin", status: "Povolená" },
+      { name: "Multivitamínový sirup", status: "Povolená" },
+      { name: "Isotonický nápoj Ionťák", status: "Povolená" },
+      { name: "Beta-Alanin", status: "Povolená" },
+      
+      { name: "Testosteron propionát", status: "Zakázaná" },
+      { name: "Efedrin hydrochlorid", status: "Zakázaná" },
+      { name: "Nandrolon decanoát", status: "Zakázaná" },
+      { name: "Clenbuterol", status: "Zakázaná" },
+      { name: "Stanozolol (Winstrol)", status: "Zakázaná" },
+      { name: "Meldonium (Mildronat)", status: "Zakázaná" },
+      { name: "Erytropoetin (EPO)", status: "Zakázaná" },
+      { name: "Furosemid (Diuretikum)", status: "Zakázaná" },
+      { name: "Salbutamol (nadlimitní dávka)", status: "Zakázaná" },
+      { name: "Trenbolon acetát", status: "Zakázaná" },
+      { name: "Boldenon undecylenát", status: "Zakázaná" }
     ];
+
+    // Při startu aplikace vygenerujeme tabulku v příručce (abychom ji nemuseli psát ručně po desítkách řádků v HTML)
+    function initCatalogTable() {
+      const tbody = document.getElementById('substanceTableBody');
+      tbody.innerHTML = "";
+      // Pro ztížení orientace můžeme tabulku promíchat nebo nechat abecedně / v blocích
+      catalogSubstances.forEach(item => {
+        const tr = document.createElement('tr');
+        const colorStyle = (item.status === "Povolená") ? "color:#2e7d32" : "color:#c62828";
+        tr.innerHTML = `<td>${item.name}</td><td style="${colorStyle}; font-weight:bold;">${item.status}</td>`;
+        tbody.appendChild(tr);
+      });
+    }
 
     function switchTab(tabName) {
       document.getElementById('tabSubstances').style.display = (tabName === 'substances') ? 'block' : 'none';
@@ -225,40 +253,33 @@
       const sport = sports[Math.floor(Math.random() * sports.length)];
       const id = `#${Math.floor(1000 + Math.random() * 9000)}`;
       
-      // Výběr náhodné látky ze seznamu
       const sub = catalogSubstances[Math.floor(Math.random() * catalogSubstances.length)];
-      
-      // Zda sportovec deklaruje a předkládá TUE
       const presentsTue = Math.random() < 0.35;
       
-      // Zda je TUE reálně platná v oficiálním WADA registru (vygenerujeme pár náhodných platných ID)
       activeValidTueIds = [];
       let tueRegistryText = "<ul>";
-      if (presentsTue && Math.random() < 0.7) {
-        // 70% šance, že předložená TUE je platná a je zapsaná v registru
+      if (presentsTue && Math.random() < 0.65) {
         activeValidTueIds.push(id);
         tueRegistryText += `<li><b>${id}</b> (${name}) – Platná TUE</li>`;
       } else if (presentsTue) {
-        // 30% šance, že jde o padělek (v registru chybí)
-        tueRegistryText += `<li><i>(Žádné další záznamy pro ID ${id})</i></li>`;
+        tueRegistryText += `<li><i>(ID ${id} nenalezeno v registru platných TUE)</i></li>`;
       } else {
-        tueRegistryText += `<li><i>(Žádný záznam)</i></li>`;
+        tueRegistryText += `<li><i>(Žádný záznam o podané žádosti)</i></li>`;
       }
       tueRegistryText += "</ul>";
       document.getElementById('tueRegistryList').innerHTML = tueRegistryText;
 
-      // Vyhodnocení legálnosti: Sportovec může startovat, pokud je látka povolená, NEBO pokud je zakázaná, ale má ověřenou platnou TUE v registru.
       const isSubstanceBanned = (sub.status === "Zakázaná");
       const hasValidRegistryTue = activeValidTueIds.includes(id);
       
       let shouldBeApproved = false;
       if (!isSubstanceBanned) {
-        shouldBeApproved = true; // Povolená látka -> vždy schválit
+        shouldBeApproved = true;
       } else {
         if (presentsTue && hasValidRegistryTue) {
-          shouldBeApproved = true; // Zakázaná látka, ale krytá platnou TUE -> schválit
+          shouldBeApproved = true;
         } else {
-          shouldBeApproved = false; // Zakázaná látka bez platné TUE -> zamítnout / zastavit
+          shouldBeApproved = false;
         }
       }
 
@@ -271,12 +292,10 @@
         shouldBeApproved: shouldBeApproved
       };
 
-      // Reset checkboxů na dokladu
       document.getElementById('checkBanned').checked = false;
       document.getElementById('checkAllowed').checked = false;
       document.getElementById('checkTueValid').checked = false;
 
-      // Vykreslení údajů na doklad (bez prozrazení výsledku)
       document.getElementById('docId').innerText = `ID: ${currentAthlete.id}`;
       document.getElementById('docName').innerText = currentAthlete.name;
       document.getElementById('docSport').innerText = `${currentAthlete.sport}`;
@@ -318,6 +337,7 @@
       document.getElementById('modalOverlay').style.display = 'none';
       checkedCount = 0;
       errorsCount = 0;
+      initCatalogTable();
       updateHUD();
       generateAthlete();
     }
@@ -331,17 +351,17 @@
       overlay.style.display = 'flex';
 
       if (success) {
-        title.innerText = `DEN ${currentDay} ÚSPĚŠNĚ UUKONČEN`;
-        desc.innerText = `Skvělá inspekční práce! Pečlivě jsi ověřoval/a látky i registry TUE. Posunuješ se do dalšího dne.`;
+        title.innerText = `DEN ${currentDay} ÚSPĚŠNĚ ZVLÁDNUT`;
+        desc.innerText = `Skvělé oko! Seznam látek jsi prověřil/a bezchybně. Nastává další pracovní den na stanici.`;
         btn.innerText = "DALŠÍ DEN";
         currentDay++;
-        targetToCheck += 2; // Další den o něco náročnější
+        targetToCheck += 2;
       } else {
         title.innerText = "PŘÍLIŠ MNOHO CHYB - KÁZEŇSKÝ POSTIH";
-        desc.innerText = `Pustil/a jsi do závodu sportovce s nedovolenou látkou bez platné TUE, nebo neoprávněně zastavil/a čistého sportovce.`;
+        desc.innerText = `Inspekce zaznamenala příliš mnoho špatných rozhodnutí. Někdo proklouznul sítem nebo byl neprávem zastaven.`;
         btn.innerText = "ZKUSIT ZNOVU";
         currentDay = 1;
-        targetToCheck = 5;
+        targetToCheck = 6;
         errorsCount = 0;
         checkedCount = 0;
       }
