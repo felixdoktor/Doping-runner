@@ -205,14 +205,28 @@
     <div class="modal-content">
       <h2 id="modalTitle">Směna inspektora začíná</h2>
       <div id="modalBodyContent">
-        <p id="modalDesc">Prověřujte průkazy, kontrolujte občankové pixelové fotky, porovnávejte látky v katalogu a ověřujte TUE v registru. Pozor na chyby!</p>
+        <p id="modalDesc">Prověřujte průkazy, kontrolujte náhodně generované pixelové fotky, porovnávejte látky v katalogu a ověřujte TUE v registru. Pozor na chyby!</p>
       </div>
       <button class="stamp-btn" id="modalBtn" onclick="startGame()" style="background: var(--adv-blue); color: white; width: 100%; margin-top: 15px;">ZAHÁJIT SMĚNU</button>
     </div>
   </div>
 
   <script type="module">
-    import { athleteNames } from './resources/names.js';
+    import { athleteNames as importedNames } from './resources/names.js';
+
+    // Pojistka pro lokální spouštění (pokud prohlížeč blokuje CORS modulů přes file://)
+    const fallbackNames = [
+      { name: "Jan Novák", profession: "Atlet / Běžec" },
+      { name: "Petr Svoboda", profession: "Silniční cyklista" },
+      { name: "Eva Dvořáková", profession: "Vzpěračka" },
+      { name: "Lucie Černá", profession: "Plavkyně" },
+      { name: "Tomáš Procházka", profession: "Kulturista" },
+      { name: "Klára Kučerová", profession: "Sportovní střelkyně" },
+      { name: "David Veselý", profession: "Biatlonista" },
+      { name: "Marie Horáková", profession: "Sedbojařka" }
+    ];
+
+    const athleteNames = (importedNames && importedNames.length > 0) ? importedNames : fallbackNames;
 
     let currentDay = 1;
     let checkedCount = 0;
@@ -222,7 +236,7 @@
 
     let currentAthlete = null;
     let activeValidTueIds = [];
-    let shiftHistory = []; // Uchovává záznamy rozhodnutí pro finální zhodnocení dne
+    let shiftHistory = [];
 
     const catalogSubstances = [
       { name: "Vitamin C (Kyselina askorbová)", status: "Povolená" },
@@ -271,8 +285,10 @@
       buttons[1].className = (tabName === 'tueRegistry') ? 'tab-btn active' : 'tab-btn';
     }
 
-    function drawIdPhoto(seedString) {
+    // Automatické generování pixelové občankové fotky (nezávislé na jménu)
+    function drawRandomIdPhoto() {
       const canvas = document.getElementById('idPhotoCanvas');
+      if (!canvas) return;
       const ctx = canvas.getContext('2d');
       ctx.imageSmoothingEnabled = false;
       ctx.clearRect(0, 0, 24, 30);
@@ -280,33 +296,32 @@
       ctx.fillStyle = '#e3ded8';
       ctx.fillRect(0, 0, 24, 30);
 
-      let hash = 0;
-      for (let i = 0; i < seedString.length; i++) {
-        hash = seedString.charCodeAt(i) + ((hash << 5) - hash);
-      }
-
       const skinColors = ['#ffdbac', '#f1c27d', '#e0ac69', '#c68642', '#8d5524'];
       const hairColors = ['#2c1605', '#4a312c', '#b55239', '#d7bf87', '#111111'];
       const shirtColors = ['#000aff', '#2e7d32', '#c62828', '#333333', '#d7c08c'];
 
-      const skin = skinColors[Math.abs(hash) % skinColors.length];
-      const hair = hairColors[Math.abs(hash >> 2) % hairColors.length];
-      const shirt = shirtColors[Math.abs(hash >> 4) % shirtColors.length];
+      const skin = skinColors[Math.floor(Math.random() * skinColors.length)];
+      const hair = hairColors[Math.floor(Math.random() * hairColors.length)];
+      const shirt = shirtColors[Math.floor(Math.random() * shirtColors.length)];
 
+      // Tělo / tričko
       ctx.fillStyle = shirt;
       ctx.fillRect(5, 23, 14, 8);
 
+      // Hlava
       ctx.fillStyle = skin;
       ctx.fillRect(7, 8, 10, 12);
 
+      // Vlasy
       ctx.fillStyle = hair;
       ctx.fillRect(7, 7, 10, 4);
-      if (Math.abs(hash) % 2 === 0) {
+      if (Math.random() > 0.5) {
         ctx.fillRect(6, 9, 2, 4);
       } else {
         ctx.fillRect(16, 9, 2, 4);
       }
 
+      // Oči
       ctx.fillStyle = '#000000';
       ctx.fillRect(9, 13, 2, 2);
       ctx.fillRect(13, 13, 2, 2);
@@ -371,14 +386,14 @@
       tueStatusEl.innerText = currentAthlete.presentsTue ? "Předložena Žádost o TUE" : "Neuvedena";
       tueStatusEl.style.color = currentAthlete.presentsTue ? "#000aff" : "#666";
 
-      drawIdPhoto(currentAthlete.name);
+      // Vykreslení náhodné pixelové fotky
+      drawRandomIdPhoto();
     }
 
     window.handleDecision = function(decision) {
       const playerApproved = (decision === 'approve');
       const isCorrect = (playerApproved === currentAthlete.shouldBeApproved);
 
-      // Zápis do historie pro finální zhodnocení
       shiftHistory.push({
         name: currentAthlete.name,
         id: currentAthlete.id,
@@ -416,7 +431,7 @@
       document.getElementById('modalOverlay').style.display = 'none';
       checkedCount = 0;
       errorsCount = 0;
-      shiftHistory = []; // Reset historie pro novou směnu
+      shiftHistory = [];
       initCatalogTable();
       updateHUD();
       generateAthlete();
@@ -444,7 +459,6 @@
         checkedCount = 0;
       }
 
-      // Sestavení přehledného zhodnocení a tabulky chyb
       let htmlReport = `<p>${success ? 'Skvělá práce! Zde je zhodnocení tvých rozhodnutí:' : 'Směna skončila kvůli chybám. Podívej se na přehled případů:'}</p>`;
       htmlReport += `<div style="max-height: 250px; overflow-y: auto; text-align: left; font-size: 11px; margin-top: 10px; border: 1px solid #ccc; padding: 5px;">`;
       htmlReport += `<table style="width: 100%; border-collapse: collapse;">`;
