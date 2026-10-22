@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Clean Runner: Fair Play</title>
+  <title>Clean Runner: Fair Play - Hra</title>
   <style>
     :root {
       --adv-blue: #000AFF;
@@ -38,13 +38,12 @@
     #lives-box { border-left-color: var(--adv-white); border: 2px solid var(--adv-black); color: var(--adv-black); background: var(--adv-white); }
     #tue-box { border-left-color: #00ffcc; color: #00ffcc; }
     
-    /* Dynamické zvětšení okna hry podle velikosti obrazovky */
     #game-container {
       position: relative; border: 6px solid var(--adv-black); border-radius: 4px; 
       overflow: hidden; 
-      height: 85vh; /* Využije až 85 % výšky obrazovky */
+      height: 85vh;
       max-height: 950px;
-      aspect-ratio: 9 / 16; /* Udrží správný poměr stran */
+      aspect-ratio: 9 / 16;
       box-shadow: 0 10px 30px rgba(0,0,0,0.15);
     }
     
@@ -211,6 +210,8 @@
 
       <button class="action-btn" id="startBtn">ZAHÁJIT ZÁVOD</button>
       <button class="action-btn" id="startLeaderboardBtn">🏆 TOP 10 ŽEBŘÍČEK</button>
+      <br><br>
+      <a href="index.html" style="color: var(--adv-blue); font-size: 13px; text-decoration: none;">⬅️ Zpět na úvodní stránku</a>
     </div>
   </div>
 
@@ -238,7 +239,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getDatabase, ref, push, onValue, remove, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-    import { questions } from './questions.js';
+    import { questions } from './resources/questions.js';
 
     const firebaseConfig = {
       apiKey: "AIzaSyDYXM5ioUkvXIKrgQVSjYxjacqn8vm2vBA",
@@ -275,21 +276,21 @@
       bgStadiumToCity: new Image()
     };
 
-    images.clean[0].src = 'clean1.png';
-    images.clean[1].src = 'clean2.png';
-    images.dope_red.src = 'dope_red.png';
-    images.dope_blue.src = 'dope_blue.png';
-    images.dope_bad.src = 'dope_black.png'; 
-    images.doctor.src = 'doctor.png';
-    images.lawyer.src = 'lawyer.png';
-    images.tue.src = 'tue.png'; 
+    images.clean[0].src = 'resources/images/clean1.png';
+    images.clean[1].src = 'resources/images/clean2.png';
+    images.dope_red.src = 'resources/images/dope_red.png';
+    images.dope_blue.src = 'resources/images/dope_blue.png';
+    images.dope_bad.src = 'resources/images/dope_black.png'; 
+    images.doctor.src = 'resources/images/doctor.png';
+    images.lawyer.src = 'resources/images/lawyer.png';
+    images.tue.src = 'resources/images/tue.png'; 
 
-    images.bgCity.src = 'sector_city.png';
-    images.bgCityToForest.src = 'trans_city_to_forest.png';
-    images.bgForest.src = 'sector_forest.png';
-    images.bgForestToStadium.src = 'trans_forest_to_stadium.png';
-    images.bgStadium.src = 'sector_stadium.png';
-    images.bgStadiumToCity.src = 'trans_stadium_to_city.png';
+    images.bgCity.src = 'resources/images/sector_city.png';
+    images.bgCityToForest.src = 'resources/images/trans_city_to_forest.png';
+    images.bgForest.src = 'resources/images/sector_forest.png';
+    images.bgForestToStadium.src = 'resources/images/trans_forest_to_stadium.png';
+    images.bgStadium.src = 'resources/images/sector_stadium.png';
+    images.bgStadiumToCity.src = 'resources/images/trans_stadium_to_city.png';
 
     window.selectedType = 'vytrvalec';
     window.setAthlete = function(type) {
