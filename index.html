@@ -22,25 +22,29 @@
     h1 {
       color: var(--adv-blue); font-weight: bold; text-transform: uppercase;
       letter-spacing: 1px; margin-bottom: 5px; text-align: center;
-      font-size: 22px;
+      font-size: 20px;
     }
 
     #ui {
-      display: flex; gap: 6px; margin-bottom: 8px; font-size: 14px; font-weight: bold;
-      flex-wrap: wrap; justify-content: center; width: 95%; max-width: 500px;
+      display: flex; gap: 6px; margin-bottom: 6px; font-size: 13px; font-weight: bold;
+      flex-wrap: wrap; justify-content: center; width: 95%; max-width: 540px;
     }
     
     .hud-box {
-      background: var(--adv-black); color: var(--adv-white); padding: 6px 10px; 
+      background: var(--adv-black); color: var(--adv-white); padding: 5px 8px; 
       border-radius: 4px; border-left: 5px solid var(--adv-blue);
     }
     #danger-box { border-left-color: var(--adv-gold); }
     #lives-box { border-left-color: var(--adv-white); border: 2px solid var(--adv-black); color: var(--adv-black); background: var(--adv-white); }
     #tue-box { border-left-color: #00ffcc; color: #00ffcc; }
     
+    /* Dynamické zvětšení okna hry podle velikosti obrazovky */
     #game-container {
       position: relative; border: 6px solid var(--adv-black); border-radius: 4px; 
-      overflow: hidden; width: 95%; max-width: 500px; aspect-ratio: 9 / 16; max-height: 72vh;
+      overflow: hidden; 
+      height: 85vh; /* Využije až 85 % výšky obrazovky */
+      max-height: 950px;
+      aspect-ratio: 9 / 16; /* Udrží správný poměr stran */
       box-shadow: 0 10px 30px rgba(0,0,0,0.15);
     }
     
@@ -728,24 +732,23 @@
       }
     }
 
-    // Všechny bloky (včetně normálních sektorů) mají nyní invert: true pro správný směr běhu dopředu
     function getModularBackground(scrollY) {
       const sectorStep = 2500;
       const totalLoop = sectorStep * 6;
       let pos = scrollY % totalLoop;
 
       if (pos < sectorStep) {
-        return { img: images.bgCity, progress: pos / sectorStep, invert: true };
+        return { img: images.bgCity, progress: pos / sectorStep, invert: false };
       } else if (pos < sectorStep * 2) {
-        return { img: images.bgCityToForest, progress: (pos - sectorStep) / sectorStep, invert: true };
+        return { img: images.bgCityToForest, progress: (pos - sectorStep) / sectorStep, invert: false };
       } else if (pos < sectorStep * 3) {
-        return { img: images.bgForest, progress: (pos - sectorStep * 2) / sectorStep, invert: true };
+        return { img: images.bgForest, progress: (pos - sectorStep * 2) / sectorStep, invert: false };
       } else if (pos < sectorStep * 4) {
-        return { img: images.bgForestToStadium, progress: (pos - sectorStep * 3) / sectorStep, invert: true };
+        return { img: images.bgForestToStadium, progress: (pos - sectorStep * 3) / sectorStep, invert: false };
       } else if (pos < sectorStep * 5) {
-        return { img: images.bgStadium, progress: (pos - sectorStep * 4) / sectorStep, invert: true };
+        return { img: images.bgStadium, progress: (pos - sectorStep * 4) / sectorStep, invert: false };
       } else {
-        return { img: images.bgStadiumToCity, progress: (pos - sectorStep * 5) / sectorStep, invert: true };
+        return { img: images.bgStadiumToCity, progress: (pos - sectorStep * 5) / sectorStep, invert: false };
       }
     }
 
