@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Clean Runner: Fair Play - Úvod</title>
+  <title>Clean Sport Games - Hlavní rozcestník</title>
   <style>
     :root {
       --adv-blue: #000AFF;
@@ -15,262 +15,93 @@
     body {
       margin: 0; background: #f4f4f9; color: var(--adv-black);
       font-family: Arial, sans-serif; 
-      display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
       min-height: 100vh; padding: 20px; box-sizing: border-box;
     }
 
     .container {
       background: var(--adv-white); border-top: 10px solid var(--adv-blue); border-radius: 8px;
-      padding: 30px; max-width: 600px; width: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-      text-align: center; margin-top: 20px; box-sizing: border-box;
+      padding: 40px; max-width: 550px; width: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      text-align: center; box-sizing: border-box;
     }
 
     h1 {
       color: var(--adv-blue); font-weight: bold; text-transform: uppercase;
-      letter-spacing: 1px; margin-bottom: 5px; font-size: 26px;
+      letter-spacing: 1px; margin-bottom: 5px; font-size: 28px;
     }
 
     .subtitle {
-      font-size: 14px; color: #666; margin-bottom: 25px; font-weight: bold;
+      font-size: 14px; color: #666; margin-bottom: 30px; font-weight: bold;
     }
 
-    .section-title {
-      color: var(--adv-blue); font-size: 16px; font-weight: bold; margin-top: 20px; margin-bottom: 8px; text-align: left;
-      border-bottom: 2px solid #eee; padding-bottom: 4px; text-transform: uppercase;
+    .games-grid {
+      display: flex; flex-direction: column; gap: 15px; justify-content: center;
     }
 
-    p, ul {
-      font-size: 14px; line-height: 1.5; color: #333; text-align: left; margin-bottom: 15px;
+    .game-card {
+      background: #fafafa; border: 3px solid var(--adv-black); border-radius: 8px;
+      padding: 20px; box-sizing: border-box; text-align: center;
+      transition: transform 0.2s, box-shadow 0.2s; display: flex; flex-direction: column; align-items: center; gap: 10px;
     }
 
-    ul { padding-left: 20px; }
-    li { margin-bottom: 6px; }
-
-    /* Styly pro rozbalovací sekci (Vysvětlivky) */
-    details {
-      background: #fafafa;
-      border: 2px solid #ddd;
-      border-radius: 6px;
-      margin: 15px 0;
-      text-align: left;
-      overflow: hidden;
-      transition: border-color 0.2s;
-    }
-    details[open] {
+    .game-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0,10,255,0.2);
       border-color: var(--adv-blue);
     }
-    summary {
-      padding: 12px 15px;
-      font-weight: bold;
-      color: var(--adv-blue);
-      cursor: pointer;
-      user-select: none;
-      background: #f0f2f5;
-      outline: none;
-    }
-    summary:hover {
-      background: #e4e8ef;
-    }
-    .legend-content {
-      padding: 15px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      border-bottom: 1px solid #eee;
-      padding-bottom: 10px;
-    }
-    .legend-item:last-child {
-      border-bottom: none;
-      padding-bottom: 0;
-    }
-    .legend-icon {
-      width: 40px;
-      height: 40px;
-      object-fit: contain;
-      image-rendering: pixelated;
-      background: #222;
-      border-radius: 4px;
-      padding: 4px;
-      flex-shrink: 0;
-    }
-    .legend-badge {
-      width: 40px;
-      height: 40px;
-      background: #000;
-      color: #fff;
-      border-radius: 4px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      flex-shrink: 0;
-      border: 1px solid var(--adv-gold);
-    }
-    .legend-desc b {
-      color: var(--adv-black);
-    }
-    .legend-desc {
-      font-size: 13px;
-      color: #443;
-      margin: 0;
+
+    .game-card h3 {
+      color: var(--adv-blue); margin: 0; font-size: 20px;
     }
 
-    .game-banner {
-      margin: 25px 0;
-      position: relative;
-      border: 4px solid var(--adv-black);
-      border-radius: 8px;
-      overflow: hidden;
-      cursor: pointer;
-      display: inline-block;
-      transition: transform 0.2s, box-shadow 0.2s;
-      background: #000;
-      max-width: 300px;
-      width: 100%;
+    .game-card p {
+      font-size: 13px; color: #555; margin: 0; text-align: center;
     }
 
-    .game-banner:hover {
-      transform: scale(1.03);
-      box-shadow: 0 8px 25px rgba(0,10,255,0.3);
+    .action-btn {
+      background: var(--adv-blue); color: var(--adv-white); border: none; padding: 12px 25px;
+      font-size: 14px; font-weight: bold; border-radius: 25px; cursor: pointer; text-decoration: none;
+      display: inline-block; transition: background 0.2s; text-transform: uppercase; margin-top: 5px;
     }
+    .action-btn:hover { background: var(--adv-black); }
 
-    .game-banner img {
-      width: 100%;
-      display: block;
-      opacity: 0.85;
-      transition: opacity 0.2s;
-    }
-
-    .game-banner:hover img {
-      opacity: 1;
-    }
-
-    .play-overlay {
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      background: rgba(0, 0, 0, 0.4);
-      color: var(--adv-white);
-      font-weight: bold;
-    }
-
-    .play-btn-large {
-      background: var(--adv-blue); color: var(--adv-white); border: none; padding: 14px 30px;
-      font-size: 18px; font-weight: bold; border-radius: 30px; cursor: pointer; text-decoration: none;
-      box-shadow: 0 4px 15px rgba(0,10,255,0.4); display: inline-block; transition: background 0.2s;
-      text-transform: uppercase;
-    }
-    .play-btn-large:hover { background: var(--adv-black); }
+    .inspector-btn { background: #3b2f2f; border-bottom: 3px solid var(--adv-gold); }
+    .inspector-btn:hover { background: #554242; }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <h1>Clean Runner: Fair Play</h1>
-    <div class="subtitle">Vzdělávací retro videohra o čistém sportu a antidopingu</div>
+    <h1>Clean Sport Games</h1>
+    <div class="subtitle">Vyber si svou hru o čistém sportu a antidopingu</div>
 
-    <div class="section-title">📌 Účel a zaměření hry</div>
-    <p>
-      <b>Clean Runner</b> je interaktivní arkádová hra vytvořená za účelem širší osvěty o pravidlech fair play, ochraně zdraví sportovců a fungování světového antidopingu (WADA). Hra hravou formou seznamuje hráče s reálnými situacemi, kterým čelí vrcholoví sportovci.
-    </p>
-
-    <div class="section-title">⚙️ Klíčové herní mechaniky a pravidla</div>
-    <ul>
-      <li><b>Princip striktní odpovědnosti:</b> Sportovec nese plnou odpovědnost za každou látku, která se ocitne v jeho těle, bez ohledu na zavinění.</li>
-      <li><b>Terapeutická výjimka (TUE):</b> Unikátní dokument, který může sportovci v kritické chvíli zachránit kariéru před trestem.</li>
-      <li><b>Odborná pomoc:</b> Během závodu lze potkat sportovního lékaře nebo právníka, kteří pomohou se správnými odpověďmi v antidopingovém kvízu.</li>
-      <li><b>Profily sportovců:</b> Možnost volby mezi vytrvalcem (stabilní výdej sil) a silovým sportovcem (specifická regenerace).</li>
-    </ul>
-
-    <!-- Rozbalovací vysvětlivky předmětů -->
-    <details>
-      <summary>📖 Legenda předmětů a prvků na trati (klikni pro rozbalení)</summary>
-      <div class="legend-content">
-        
-        <div class="legend-item">
-          <img src="resources/images/clean2.png" alt="Voda" class="legend-icon">
-          <div class="legend-desc">
-            <b>Voda (Lahvička):</b> Bezpečný zdroj hydratace, který dodává energii nezbytnou pro dokončení závodu bez rizika dopingu.
-          </div>
-        </div>
-
-        <div class="legend-item">
-          <img src="resources/images/clean1.png" alt="Banán" class="legend-icon">
-          <div class="legend-desc">
-            <b>Zdravá svačina (Banán):</b> Přírodní zdroj energie pro sportovce zcela bezpečný a čistý.
-          </div>
-        </div>
-
-        <div class="legend-item">
-          <div class="legend-badge">🚧</div>
-          <div class="legend-desc">
-            <b>WADA brána (Dopingová kontrola):</b> Pravidelná kontrola na trati. Pokud máš čistou krev, získáš bonusovou energii. Pokud jsi pod vlivem dopingu, čeká tě přísný antidopingový kvíz!
-          </div>
-        </div>
-
-        <div class="legend-item">
-          <img src="resources/images/dope_red.png" alt="Zakázaná látka" class="legend-icon">
-          <div class="legend-desc">
-            <b>Zakázaná látka (Červená):</b> Výrazně doplní energii, ale zanese do krve doping a spustí princip striktní odpovědnosti.
-          </div>
-        </div>
-
-        <div class="legend-item">
-          <img src="resources/images/dope_blue.png" alt="Stimulant" class="legend-icon">
-          <div class="legend-desc">
-            <b>Stimulant (Modrá):</b> Mírně doplní energii a přidá menší množství stop dopingu do systému.
-          </div>
-        </div>
-
-        <div class="legend-item">
-          <img src="resources/images/dope_black.png" alt="Kontaminovaný doplněk" class="legend-icon">
-          <div class="legend-desc">
-            <b>Kontaminovaný doplněk (Černý):</b> Nebezpečný skrytý doping – ubere energii, zhorší dopingový profil a potrestá tě.
-          </div>
-        </div>
-
-        <div class="legend-item">
-          <img src="resources/images/tue.png" alt="TUE Výjimka" class="legend-icon">
-          <div class="legend-desc">
-            <b>Terapeutická výjimka (TUE):</b> Cenný dokument. Poslouží jako ochranný štít, který tě jednou zachrání před trestem při kontrole WADA.
-          </div>
-        </div>
-
-        <div class="legend-item">
-          <img src="resources/images/doctor.png" alt="Lékař" class="legend-icon">
-          <div class="legend-desc">
-            <b>Sportovní lékař:</b> Po sebrání a úspěšném zodpovězení otázky získáte zpět 1 život (srdíčko).
-          </div>
-        </div>
-
-        <div class="legend-item">
-          <img src="resources/images/lawyer.png" alt="Právník" class="legend-icon">
-          <div class="legend-desc">
-            <b>Právník (pan Exner):</b> Po sebrání a správné odpovědi v kvízu kompletně očistí krev (vymaže nahromaděný doping).
-          </div>
-        </div>
-
+    <div class="games-grid">
+      <!-- Karta pro Clean Runner -->
+      <div class="game-card">
+        <h3>🏃 Clean Runner</h3>
+        <p>Běhej po trati, sbírej čisté doplňky, vyhýbej se dopingu a obhájej svou čest před WADA.</p>
+        <a href="runner-intro.html" class="action-btn">ZVOLIT TUTO HRU</a>
       </div>
-    </details>
 
-    <div class="section-title">🎮 Spustit hru</div>
-    <p style="text-align: center; margin-bottom: 5px;">Kliknutím na obrázek nebo tlačítko níže vstoupíš do závodu:</p>
-
-    <a href="game.html" class="game-banner">
-      <img src="resources/images/sector_city.png" alt="Clean Runner Ikona Hry">
-      <div class="play-overlay">
-        <span style="font-size: 22px; text-shadow: 2px 2px 4px #000;">▶ SPUSTIT HRU</span>
+      <!-- Karta pro Clean Inspector -->
+      <div class="game-card">
+        <h3>📋 Clean Inspector</h3>
+        <p>Administrativní simulace (Papers, Please). Kontroluj vzorky, listuj v katalogu látek a WADA registru.</p>
+        <button class="action-btn inspector-btn" onclick="openInspectorIntro()">ZVOLIT TUTO HRU</button>
       </div>
-    </a>
-
-    <br>
-    <a href="game.html" class="play-btn-large">VSTOUPIT DO ZÁVODU ➔</a>
+    </div>
   </div>
+
+  <script>
+    function openInspectorIntro() {
+      const pwd = prompt("Zadej heslo pro přístup ke Clean Inspector:");
+      if (pwd === "simonjeborec") {
+        window.location.href = "inspector-intro.html";
+      } else if (pwd !== null) {
+        alert("Chybné heslo!");
+      }
+    }
+  </script>
 
 </body>
 </html>
