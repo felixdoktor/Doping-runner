@@ -46,6 +46,67 @@
     ul { padding-left: 20px; }
     li { margin-bottom: 6px; }
 
+    /* Styly pro rozbalovací sekci (Vysvětlivky) */
+    details {
+      background: #fafafa;
+      border: 2px solid #ddd;
+      border-radius: 6px;
+      margin: 15px 0;
+      text-align: left;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    details[open] {
+      border-color: var(--adv-blue);
+    }
+    summary {
+      padding: 12px 15px;
+      font-weight: bold;
+      color: var(--adv-blue);
+      cursor: pointer;
+      user-select: none;
+      background: #f0f2f5;
+      outline: none;
+    }
+    summary:hover {
+      background: #e4e8ef;
+    }
+    .legend-content {
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 10px;
+    }
+    .legend-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+    .legend-icon {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
+      image-rendering: pixelated;
+      background: #222;
+      border-radius: 4px;
+      padding: 4px;
+      flex-shrink: 0;
+    }
+    .legend-desc b {
+      color: var(--adv-black);
+    }
+    .legend-desc {
+      font-size: 13px;
+      color: #443;
+      margin: 0;
+    }
+
     .game-banner {
       margin: 25px 0;
       position: relative;
@@ -102,7 +163,7 @@
 
     <div class="section-title">📌 Účel a zaměření hry</div>
     <p>
-      <b>Clean Runner</b> je interaktivní arkádová hra vytvořená za účelem širší osvěty o pravidlech fair play, ochraně zdraví sportovců a fungování světového antidopingu (WADA). Hra hravou formou seznamuje hráče s reálnými situacemi, kterým čelí vrcholoví sportovci.
+      <b>Clean Runner</b> je interaktivní arkádová hra vytvořená za účlem širší osvěty o pravidlech fair play, ochraně zdraví sportovců a fungování světového antidopingu (WADA). Hra hravou formou seznamuje hráče s reálnými situacemi, kterým čelí vrcholoví sportovci.
     </p>
 
     <div class="section-title">⚙️ Klíčové herní mechaniky a pravidla</div>
@@ -112,6 +173,63 @@
       <li><b>Odborná pomoc:</b> Během závodu lze potkat sportovního lékaře nebo právníka, kteří pomohou se správnými odpověďmi v antidopingovém kvízu.</li>
       <li><b>Profily sportovců:</b> Možnost volby mezi vytrvalcem (stabilní výdej sil) a silovým sportovcem (specifická regenerace).</li>
     </ul>
+
+    <!-- Rozbalovací vysvětlivky předmětů -->
+    <details>
+      <summary>📖 Legenda předmětů a prvků na trati (klikni pro rozbalení)</summary>
+      <div class="legend-content">
+        
+        <div class="legend-item">
+          <img src="resources/images/clean1.png" alt="Čistý doplněk" class="legend-icon">
+          <div class="legend-desc">
+            <b>Bezpečný doplněk / Voda:</b> Dodává energii nezbytnou pro dokončení závodu bez jakéhokoli rizika dopingu.
+          </div>
+        </div>
+
+        <div class="legend-item">
+          <img src="resources/images/dope_red.png" alt="Zakázaná látka" class="legend-icon">
+          <div class="legend-desc">
+            <b>Zakázaná látka (Červená):</b> Výrazně doplní energii, ale zanese do krve doping a spustí princip striktní odpovědnosti.
+          </div>
+        </div>
+
+        <div class="legend-item">
+          <img src="resources/images/dope_blue.png" alt="Stimulant" class="legend-icon">
+          <div class="legend-desc">
+            <b>Stimulant (Modrá):</b> Mírně doplní energii a přidá menší množství stop dopingu do systému.
+          </div>
+        </div>
+
+        <div class="legend-item">
+          <img src="resources/images/dope_black.png" alt="Kontaminovaný doplněk" class="legend-icon">
+          <div class="legend-desc">
+            <b>Kontaminovaný doplněk (Černý):</b> Nebezpečný skrytý doping – ubere energii, zhorší dopingový profil a potrestá tě.
+          </div>
+        </div>
+
+        <div class="legend-item">
+          <img src="resources/images/tue.png" alt="TUE Výjimka" class="legend-icon">
+          <div class="legend-desc">
+            <b>Terapeutická výjimka (TUE):</b> Cenný dokument. Poslouží jako ochranný štít, který tě jednou zachrání před trestem při kontrole WADA.
+          </div>
+        </div>
+
+        <div class="legend-item">
+          <img src="resources/images/doctor.png" alt="Lékař" class="legend-icon">
+          <div class="legend-desc">
+            <b>Sportovní lékař:</b> Po sebrání a úspěšném zodpovězení otázky získáte zpět 1 život (srdíčko).
+          </div>
+        </div>
+
+        <div class="legend-item">
+          <img src="resources/images/lawyer.png" alt="Právník" class="legend-icon">
+          <div class="legend-desc">
+            <b>Právník (Mgr. Exner):</b> Po sebrání a správné odpovědi v kvízu kompletně očistí krev (vymaže nahromaděný doping).
+          </div>
+        </div>
+
+      </div>
+    </details>
 
     <div class="section-title">🎮 Spustit hru</div>
     <p style="text-align: center; margin-bottom: 5px;">Kliknutím na obrázek nebo tlačítko níže vstoupíš do závodu:</p>
