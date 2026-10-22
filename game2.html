@@ -27,27 +27,29 @@
 
     #desk-container {
       position: relative; background: #3b2f2f; border: 8px solid #221a1a; border-radius: 6px;
-      width: 100%; max-width: 750px; height: 560px; box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+      width: 100%; max-width: 800px; height: 600px; box-shadow: 0 15px 35px rgba(0,0,0,0.6);
       display: flex; flex-direction: column; justify-content: space-between; padding: 15px; box-sizing: border-box;
       margin-top: 10px;
     }
 
-    /* Horní panel / Stav */
     .hud-bar {
       display: flex; justify-content: space-between; background: #111; color: var(--adv-gold);
       padding: 8px 12px; border-radius: 4px; font-size: 13px; font-weight: bold; border: 1px solid #555;
     }
 
-    /* Pracovní plocha s doklady */
-    #document-area {
+    /* Pracovní plocha a záložky příruček */
+    .workspace {
       position: relative; flex-grow: 1; margin: 10px 0; background: #2c2222;
-      border-radius: 4px; display: flex; justify-content: center; align-items: center; overflow: hidden;
+      border-radius: 4px; display: flex; justify-content: space-between; padding: 15px; box-sizing: border-box; gap: 15px;
+    }
+
+    .document-pane {
+      flex: 1; position: relative; display: flex; justify-content: center; align-items: center;
     }
 
     .document {
       background: var(--paper-bg); border: 2px solid #d1cbbd; border-radius: 4px;
-      width: 340px; padding: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-      position: absolute; transform: rotate(-1deg);
+      width: 100%; max-width: 360px; padding: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
       font-family: Arial, sans-serif; box-sizing: border-box;
     }
 
@@ -57,14 +59,37 @@
     }
 
     .doc-row {
-      font-size: 12px; margin-bottom: 6px; color: #444; line-height: 1.3;
+      font-size: 12px; margin-bottom: 8px; color: #444; line-height: 1.3;
     }
 
     .doc-row span { font-weight: bold; color: #000; }
 
-    /* Ovládací panel / Razítka */
+    /* Panel příruček na stole */
+    .manual-pane {
+      flex: 1; background: #221c1c; border: 2px solid #443333; border-radius: 4px; padding: 10px;
+      display: flex; flex-direction: column; color: #ccc; font-family: Arial, sans-serif; font-size: 11px;
+    }
+
+    .manual-tabs {
+      display: flex; gap: 5px; margin-bottom: 8px; border-bottom: 1px solid #444; padding-bottom: 5px;
+    }
+
+    .tab-btn {
+      background: #332b2b; color: #aaa; border: none; padding: 5px 10px; cursor: pointer; font-size: 10px; font-weight: bold; border-radius: 3px;
+    }
+    .tab-btn.active { background: var(--adv-gold); color: #000; }
+
+    .manual-content {
+      flex-grow: 1; overflow-y: auto; background: #181414; padding: 8px; border-radius: 3px; border: 1px solid #332222;
+    }
+
+    .manual-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+    .manual-table th, .manual-table td { border: 1px solid #333; padding: 4px 6px; text-align: left; }
+    .manual-table th { background: #262020; color: var(--adv-gold); }
+
+    /* Ovládací panel */
     .control-panel {
-      display: flex; gap: 10px; justify-content: center;
+      display: flex; gap: 10px; justify-content: center; align-items: center;
     }
 
     button.stamp-btn {
@@ -75,14 +100,6 @@
 
     #approveBtn { background: #2e7d32; color: white; border-bottom: 4px solid #1b5e20; }
     #rejectBtn { background: #c62828; color: white; border-bottom: 4px solid #b71c1c; }
-
-    /* Pravidla / Referenční list */
-    #rulebook {
-      margin-top: 10px; background: #262630; color: #ccc; padding: 10px; border-radius: 4px;
-      font-size: 11px; max-width: 750px; width: 100%; box-sizing: border-box; line-height: 1.4;
-      border: 1px solid #444;
-    }
-    #rulebook b { color: var(--adv-gold); }
 
     .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -107,41 +124,65 @@
       <div>Chyby: <span id="errorsVal">0</span>/3 ❌</div>
     </div>
 
-    <div id="document-area">
-      <!-- Sem se dynamicky generují doklady sportovce -->
-      <div id="docCard" class="document">
-        <div class="doc-header">
-          <span>WADA KONTROLNÍ PROPUSTKA</span>
-          <span id="docId">ID: #9482</span>
+    <div class="workspace">
+      <!-- Levá strana: Doklady sportovce -->
+      <div class="document-pane">
+        <div id="docCard" class="document">
+          <div class="doc-header">
+            <span>WADA PROPUSTKA</span>
+            <span id="docId">ID: #0000</span>
+          </div>
+          <div class="doc-row">Sportovec: <span id="docName">Jméno</span></div>
+          <div class="doc-row">Sport / Tým: <span id="docSport">Sport</span></div>
+          <div class="doc-row">Nalezená látka ve vzorku: <span id="docSubstance" style="color: #b71c1c;">Látka</span></div>
+          <div class="doc-row">Předložená TUE: <span id="docTueStatus">Žádná</span></div>
+          
+          <div class="doc-row" style="margin-top: 12px; border-top: 1px dashed #ccc; padding-top: 8px; background: #f0eee6; padding: 6px; border-radius: 3px;">
+            <b>Pomocník inspektora:</b><br>
+            <label><input type="checkbox" id="checkBanned"> ⛔ Zakázaná látka</label><br>
+            <label><input type="checkbox" id="checkAllowed"> ✔ Povolená látka</label><br>
+            <label><input type="checkbox" id="checkTueValid"> 📜 TUE je platná v registru</label>
+          </div>
         </div>
-        <div class="doc-row">Sportovec: <span id="docName">Jan Novák</span></div>
-        <div class="doc-row">Sport / Tým: <span id="docSport">Atletika / Česko</span></div>
-        <div class="doc-row">Deklarovaný doplněk: <span id="docSupplement">Vitamin C (Čistý)</span></div>
-        <div class="doc-row">TUE (Výjimka): <span id="docTue">Žádná</span></div>
-        <div class="doc-row" style="margin-top: 10px; border-top: 1px dashed #ccc; padding-top: 5px;">
-          Laboratorní test vzorku: <span id="docLabResult" style="color: #2e7d32;">NEGATIVNÍ (Čistý)</span>
+      </div>
+
+      <!-- Pravá strana: Referenční příručky na stole -->
+      <div class="manual-pane">
+        <div class="manual-tabs">
+          <button class="tab-btn active" onclick="switchTab('substances')">Seznam látek</button>
+          <button class="tab-btn" onclick="switchTab('tueRegistry')">WADA TUE Registr</button>
+        </div>
+        <div id="tabSubstances" class="manual-content">
+          <table class="manual-table">
+            <tr><th>Látka / Supplement</th><th>Status</th></tr>
+            <tr><td>Vitamin C</td><td style="color:#2e7d32">Povolená</td></tr>
+            <tr><td>Proteinový prášek</td><td style="color:#2e7d32">Povolená</td></tr>
+            <tr><td>Kofetinové tablety</td><td style="color:#2e7d32">Povolená</td></tr>
+            <tr><td>Testosteron</td><td style="color:#c62828">Zakázaná</td></tr>
+            <tr><td>Efedrin</td><td style="color:#c62828">Zakázaná</td></tr>
+            <tr><td>Nandrolon</td><td style="color:#c62828">Zakázaná</td></tr>
+          </table>
+        </div>
+        <div id="tabTueRegistry" class="manual-content" style="display: none;">
+          <div style="font-size: 10px; color: #aaa; margin-bottom: 5px;">Seznam sportovců s platnou výjimkou pro dnešní den:</div>
+          <div id="tueRegistryList" style="font-size: 11px; line-height: 1.5; color: var(--adv-gold);">
+            Načítám registry...
+          </div>
         </div>
       </div>
     </div>
 
     <div class="control-panel">
       <button class="stamp-btn" id="approveBtn" onclick="handleDecision('approve')">✔ SCHVÁLIT START</button>
-      <button class="stamp-btn" id="rejectBtn" onclick="handleDecision('reject')">✖ ZASTAVIT / POZITIVNÍ NÁLEZ</button>
+      <button class="stamp-btn" id="rejectBtn" onclick="handleDecision('reject')">✖ ZASTAVIT / TREST</button>
     </div>
-  </div>
-
-  <div id="rulebook">
-    <b>📋 PŘÍRUČKA INSPEKTORA WADA:</b><br>
-    • <b>SCHVÁLIT:</b> Pokud má sportovec čistý laboratorní test NEBO platnou Terapeutickou výjimku (TUE).<br>
-    • <b>ZASTAVIT (Pozitivní nález):</b> Pokud laboratoř hlásí <b>POZITIVNÍ NÁLEZ</b> (zakázaná látka) a sportovec <b>NEMÁ</b> platnou TUE!<br>
-    • <i>Pozor na princip striktní odpovědnosti – výmluvy na "kontaminovaný suplement" bez TUE neomlouvají!</i>
   </div>
 
   <!-- Úvodní / Konec hry okno -->
   <div id="modalOverlay" class="modal-overlay">
     <div class="modal-content">
-      <h2 id="modalTitle">Směna začíná</h2>
-      <p id="modalDesc">Zkontrolujte doklady přicházejících sportovců na dopingové stanici. Nenechte projít žádného podvodníka a nechte startovat čisté sportovce!</p>
+      <h2 id="modalTitle">Směna inspektora začíná</h2>
+      <p id="modalDesc">Prověřujte vzorky sportovců. Porovnávejte nalezené látky se Seznamem zakázaných látek a předložené TUE dokumenty s WADA Registrem. Chybné schválení podvodníka nebo zamítnutí čistého sportovce se trestá!</p>
       <button class="stamp-btn" id="modalBtn" onclick="startGame()" style="background: var(--adv-blue); color: white; width: 100%; margin-top: 10px;">ZAHÁJIT SMĚNU</button>
     </div>
   </div>
@@ -151,77 +192,108 @@
     let checkedCount = 0;
     let errorsCount = 0;
     const maxErrors = 3;
-    const targetToCheck = 5;
+    let targetToCheck = 5;
 
     let currentAthlete = null;
+    let activeValidTueIds = []; // Pole ID sportovců, kteří mají dnes platnou TUE v registru
 
-    // Generátor náhodných sportovců
     const firstNames = ["Jan", "Petr", "Eva", "Lucie", "Tomáš", "Klára", "David", "Marie"];
     const lastNames = ["Novák", "Svoboda", "Dvořák", "Černý", "Procházková", "Kučerová", "Veselý"];
     const sports = ["Atletika", "Cyklistika", "Vzpírání", "Plavání", "Kulturistika"];
     
-    const supplements = [
-      { name: "Vitamin C", status: "clean" },
-      { name: "Proteinový prášek", status: "clean" },
-      { name: "Anabolický steroid (Testosteron)", status: "dope" },
-      { name: "Kofetinové tablety", status: "clean" },
-      { name: "Zakázaný stimulant (Efedrin)", status: "dope" },
-      { name: "Kontaminovaný gainer", status: "dope" }
+    // Kompletní katalog látek s jejich oficiálním statusem
+    const catalogSubstances = [
+      { name: "Vitamin C", status: "Povolená" },
+      { name: "Proteinový prášek", status: "Povolená" },
+      { name: "Kofetinové tablety", status: "Povolená" },
+      { name: "Testosteron", status: "Zakázaná" },
+      { name: "Efedrin", status: "Zakázaná" },
+      { name: "Nandrolon", status: "Zakázaná" }
     ];
+
+    function switchTab(tabName) {
+      document.getElementById('tabSubstances').style.display = (tabName === 'substances') ? 'block' : 'none';
+      document.getElementById('tabTueRegistry').style.display = (tabName === 'tueRegistry') ? 'block' : 'none';
+      
+      const buttons = document.querySelectorAll('.tab-btn');
+      buttons[0].className = (tabName === 'substances') ? 'tab-btn active' : 'tab-btn';
+      buttons[1].className = (tabName === 'tueRegistry') ? 'tab-btn active' : 'tab-btn';
+    }
 
     function generateAthlete() {
       const name = `${firstNames[Math.floor(Math.random() * firstNames.length)]} ${lastNames[Math.floor(Math.random() * lastNames.length)]}`;
       const sport = sports[Math.floor(Math.random() * sports.length)];
       const id = `#${Math.floor(1000 + Math.random() * 9000)}`;
       
-      const supp = supplements[Math.floor(Math.random() * supplements.length)];
+      // Výběr náhodné látky ze seznamu
+      const sub = catalogSubstances[Math.floor(Math.random() * catalogSubstances.length)];
       
-      // Zda má TUE výjimku (jen občas u dopingu, nebo falešná)
-      let hasTue = Math.random() < 0.25;
+      // Zda sportovec deklaruje a předkládá TUE
+      const presentsTue = Math.random() < 0.35;
       
-      // Určení, zda je případ legálně čistý k propuštění
-      // Čistý je tehdy, když nemá doping, NEBO když má platnou TUE
-      let isLegallyClean = (supp.status === "clean") || (supp.status === "dope" && hasTue);
+      // Zda je TUE reálně platná v oficiálním WADA registru (vygenerujeme pár náhodných platných ID)
+      activeValidTueIds = [];
+      let tueRegistryText = "<ul>";
+      if (presentsTue && Math.random() < 0.7) {
+        // 70% šance, že předložená TUE je platná a je zapsaná v registru
+        activeValidTueIds.push(id);
+        tueRegistryText += `<li><b>${id}</b> (${name}) – Platná TUE</li>`;
+      } else if (presentsTue) {
+        // 30% šance, že jde o padělek (v registru chybí)
+        tueRegistryText += `<li><i>(Žádné další záznamy pro ID ${id})</i></li>`;
+      } else {
+        tueRegistryText += `<li><i>(Žádný záznam)</i></li>`;
+      }
+      tueRegistryText += "</ul>";
+      document.getElementById('tueRegistryList').innerHTML = tueRegistryText;
+
+      // Vyhodnocení legálnosti: Sportovec může startovat, pokud je látka povolená, NEBO pokud je zakázaná, ale má ověřenou platnou TUE v registru.
+      const isSubstanceBanned = (sub.status === "Zakázaná");
+      const hasValidRegistryTue = activeValidTueIds.includes(id);
+      
+      let shouldBeApproved = false;
+      if (!isSubstanceBanned) {
+        shouldBeApproved = true; // Povolená látka -> vždy schválit
+      } else {
+        if (presentsTue && hasValidRegistryTue) {
+          shouldBeApproved = true; // Zakázaná látka, ale krytá platnou TUE -> schválit
+        } else {
+          shouldBeApproved = false; // Zakázaná látka bez platné TUE -> zamítnout / zastavit
+        }
+      }
 
       currentAthlete = {
         name: name,
         sport: sport,
         id: id,
-        supplement: supp.name,
-        suppStatus: supp.status,
-        hasTue: hasTue,
-        shouldBeApproved: isLegallyClean
+        substance: sub.name,
+        presentsTue: presentsTue,
+        shouldBeApproved: shouldBeApproved
       };
 
-      // Vykreslení do dokumentu
+      // Reset checkboxů na dokladu
+      document.getElementById('checkBanned').checked = false;
+      document.getElementById('checkAllowed').checked = false;
+      document.getElementById('checkTueValid').checked = false;
+
+      // Vykreslení údajů na doklad (bez prozrazení výsledku)
       document.getElementById('docId').innerText = `ID: ${currentAthlete.id}`;
       document.getElementById('docName').innerText = currentAthlete.name;
-      document.getElementById('docSport').innerText = `${currentAthlete.sport} / Tým`;
-      document.getElementById('docSupplement').innerText = currentAthlete.supplement;
+      document.getElementById('docSport').innerText = `${currentAthlete.sport}`;
+      document.getElementById('docSubstance').innerText = currentAthlete.substance;
+      document.getElementById('docSubstance').style.color = "#000";
       
-      const tueEl = document.getElementById('docTue');
-      tueEl.innerText = currentAthlete.hasTue ? "SCHVÁLENA (Platná WADA TUE)" : "Žádná";
-      tueEl.style.color = currentAthlete.hasTue ? "#2e7d32" : "#c62828";
-
-      const labEl = document.getElementById('docLabResult');
-      if (currentAthlete.suppStatus === "dope") {
-        labEl.innerText = "POZITIVNÍ NÁLEZ (Zjištěna zakázaná látka!)";
-        labEl.style.color = "#c62828";
-      } else {
-        labEl.innerText = "NEGATIVNÍ (Vzorek čistý)";
-        labEl.style.color = "#2e7d32";
-      }
+      const tueStatusEl = document.getElementById('docTueStatus');
+      tueStatusEl.innerText = currentAthlete.presentsTue ? "Předložena Žádost o TUE" : "Neuvedena";
+      tueStatusEl.style.color = currentAthlete.presentsTue ? "#000aff" : "#666";
     }
 
     function handleDecision(decision) {
       const playerApproved = (decision === 'approve');
       
-      // Vyhodnocení správnosti
       if (playerApproved === currentAthlete.shouldBeApproved) {
-        // Správně!
         checkedCount++;
       } else {
-        // Chyba!
         errorsCount++;
       }
 
@@ -259,15 +331,17 @@
       overlay.style.display = 'flex';
 
       if (success) {
-        title.innerText = "SMĚNA ÚSPĚŠNĚ DOKONČENA!";
-        desc.innerText = `Skvělá práce, inspektore! Zkontroloval/a jsi všechny sportovce s minimem chyb. WADA je na tebe pyšná.`;
+        title.innerText = `DEN ${currentDay} ÚSPĚŠNĚ UUKONČEN`;
+        desc.innerText = `Skvělá inspekční práce! Pečlivě jsi ověřoval/a látky i registry TUE. Posunuješ se do dalšího dne.`;
         btn.innerText = "DALŠÍ DEN";
         currentDay++;
+        targetToCheck += 2; // Další den o něco náročnější
       } else {
-        title.innerText = "PŘÍLIŠ MNOHO CHYB - KÁZEŇSKÝ TREST";
-        desc.innerText = `Pustil/a jsi příliš mnoho podvodníků nebo potrestal/a nevinné. Inspekce tě odvolává ze služby.`;
+        title.innerText = "PŘÍLIŠ MNOHO CHYB - KÁZEŇSKÝ POSTIH";
+        desc.innerText = `Pustil/a jsi do závodu sportovce s nedovolenou látkou bez platné TUE, nebo neoprávněně zastavil/a čistého sportovce.`;
         btn.innerText = "ZKUSIT ZNOVU";
         currentDay = 1;
+        targetToCheck = 5;
         errorsCount = 0;
         checkedCount = 0;
       }
