@@ -173,18 +173,24 @@
       <button class="stamp-btn" id="approveBtn" onclick="handleDecision('approve')">✔ SCHVÁLIT START</button>
       <button class="stamp-btn" id="rejectBtn" onclick="handleDecision('reject')">✖ ZASTAVIT / TREST</button>
     </div>
+    
+    <div style="text-align: center; margin-top: 5px;">
+      <a href="inspector-intro.html" style="color: var(--adv-gold); font-size: 12px; text-decoration: none;">⬅️ Zpět na úvod inspekce</a>
+    </div>
   </div>
 
   <!-- Úvodní / Konec hry okno -->
   <div id="modalOverlay" class="modal-overlay">
     <div class="modal-content">
       <h2 id="modalTitle">Směna inspektora začíná</h2>
-      <p id="modalDesc">Katalog látek se rozrostl. Musíte pečlivě prohledávat tabulku v příručce, porovnávat položky a ověřovat platnost TUE v registru. Pozor na chyby!</p>
+      <p id="modalDesc">Katalog látek obsahuje desítky položek. Musíte pečlivě prohledávat tabulku v příručce, porovnávat položky a ověřovat platnost TUE v registru. Pozor na chyby!</p>
       <button class="stamp-btn" id="modalBtn" onclick="startGame()" style="background: var(--adv-blue); color: white; width: 100%; margin-top: 10px;">ZAHÁJIT SMĚNU</button>
     </div>
   </div>
 
-  <script>
+  <script type="module">
+    import { athleteNames } from './resources/names.js';
+
     let currentDay = 1;
     let checkedCount = 0;
     let errorsCount = 0;
@@ -194,11 +200,8 @@
     let currentAthlete = null;
     let activeValidTueIds = [];
 
-    const firstNames = ["Jan", "Petr", "Eva", "Lucie", "Tomáš", "Klára", "David", "Marie", "Jakub", "Tereza"];
-    const lastNames = ["Novák", "Svoboda", "Dvořák", "Černý", "Procházková", "Kučerová", "Veselý", "Horáková", "Němec"];
     const sports = ["Atletika", "Cyklistika", "Vzpírání", "Plavání", "Kulturistika", "Sportovní střelba", "Biatlon"];
     
-    // Rozsáhlý katalog látek pro poctivé hledání
     const catalogSubstances = [
       { name: "Vitamin C (Kyselina askorbová)", status: "Povolená" },
       { name: "Proteinový prášek WPC", status: "Povolená" },
@@ -226,11 +229,9 @@
       { name: "Boldenon undecylenát", status: "Zakázaná" }
     ];
 
-    // Při startu aplikace vygenerujeme tabulku v příručce (abychom ji nemuseli psát ručně po desítkách řádků v HTML)
     function initCatalogTable() {
       const tbody = document.getElementById('substanceTableBody');
       tbody.innerHTML = "";
-      // Pro ztížení orientace můžeme tabulku promíchat nebo nechat abecedně / v blocích
       catalogSubstances.forEach(item => {
         const tr = document.createElement('tr');
         const colorStyle = (item.status === "Povolená") ? "color:#2e7d32" : "color:#c62828";
@@ -239,7 +240,7 @@
       });
     }
 
-    function switchTab(tabName) {
+    window.switchTab = function(tabName) {
       document.getElementById('tabSubstances').style.display = (tabName === 'substances') ? 'block' : 'none';
       document.getElementById('tabTueRegistry').style.display = (tabName === 'tueRegistry') ? 'block' : 'none';
       
@@ -249,7 +250,8 @@
     }
 
     function generateAthlete() {
-      const name = `${firstNames[Math.floor(Math.random() * firstNames.length)]} ${lastNames[Math.floor(Math.random() * lastNames.length)]}`;
+      // Výběr náhodného jména z externího souboru names.js
+      const name = athleteNames[Math.floor(Math.random() * athleteNames.length)];
       const sport = sports[Math.floor(Math.random() * sports.length)];
       const id = `#${Math.floor(1000 + Math.random() * 9000)}`;
       
@@ -307,7 +309,7 @@
       tueStatusEl.style.color = currentAthlete.presentsTue ? "#000aff" : "#666";
     }
 
-    function handleDecision(decision) {
+    window.handleDecision = function(decision) {
       const playerApproved = (decision === 'approve');
       
       if (playerApproved === currentAthlete.shouldBeApproved) {
@@ -333,7 +335,7 @@
       document.getElementById('dayVal').innerText = `Den ${currentDay}`;
     }
 
-    function startGame() {
+    window.startGame = function() {
       document.getElementById('modalOverlay').style.display = 'none';
       checkedCount = 0;
       errorsCount = 0;
