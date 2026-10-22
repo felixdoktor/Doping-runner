@@ -111,6 +111,13 @@
       cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: transform 0.1s;
     }
     button.stamp-btn:active { transform: scale(0.95); }
+    button.stamp-btn:disabled {
+      background: #555 !important;
+      color: #888 !important;
+      border-bottom: 4px solid #333 !important;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
 
     #approveBtn { background: #2e7d32; color: white; border-bottom: 4px solid #1b5e20; }
     #rejectBtn { background: #c62828; color: white; border-bottom: 4px solid #b71c1c; }
@@ -160,7 +167,7 @@
           </div>
           
           <div class="doc-row" style="margin-top: 8px; border-top: 1px dashed #ccc; padding-top: 6px; background: #f0eee6; padding: 6px; border-radius: 3px;">
-            <b>Pomocník inspektora:</b><br>
+            <b>Pomocník inspektora (povinné označit):</b><br>
             <label><input type="checkbox" id="checkBanned"> ⛔ Zakázaná látka</label><br>
             <label><input type="checkbox" id="checkAllowed"> ✔ Povolená látka</label><br>
             <label><input type="checkbox" id="checkTueValid"> 📜 TUE je platná v registru</label>
@@ -192,8 +199,8 @@
     </div>
 
     <div class="control-panel">
-      <button class="stamp-btn" id="approveBtn" onclick="handleDecision('approve')">✔ SCHVÁLIT START</button>
-      <button class="stamp-btn" id="rejectBtn" onclick="handleDecision('reject')">✖ ZASTAVIT / TREST</button>
+      <button class="stamp-btn" id="approveBtn" onclick="handleDecision('approve')" disabled>✔ SCHVÁLIT START</button>
+      <button class="stamp-btn" id="rejectBtn" onclick="handleDecision('reject')" disabled>✖ ZASTAVIT / TREST</button>
     </div>
     
     <div style="text-align: center; margin-top: 5px;">
@@ -205,7 +212,7 @@
     <div class="modal-content">
       <h2 id="modalTitle">Směna inspektora začíná</h2>
       <div id="modalBodyContent">
-        <p id="modalDesc">Na začátku každého dne se vygeneruje pevný seznam sportovců a oficiální WADA TUE registr pro danou směnu. Ověřujte průkazy, porovnávejte látky a kontrolujte výjimky v registru!</p>
+        <p id="modalDesc">Před každým rozhodnutím (Schválit / Zastavit) musíte v pomocníku inspektora zaškrtnout, zda je látka povolená nebo zakázaná. Teprve poté se odemknou tlačítka pro postup!</p>
       </div>
       <button class="stamp-btn" id="modalBtn" onclick="startGame()" style="background: var(--adv-blue); color: white; width: 100%; margin-top: 15px;">ZAHÁJIT SMĚNU</button>
     </div>
@@ -233,9 +240,9 @@
     const maxErrors = 3;
     let targetToCheck = 6;
 
-    let dailyRoster = [];       // Pevný seznam sportovců pro aktuální den
-    let currentCaseIndex = 0;   // Index aktuálního sportovce ve frontě
-    let dayValidTueList = [];   // Master seznam platných TUE pro dnešní den
+    let dailyRoster = [];
+    let currentCaseIndex = 0;
+    let dayValidTueList = [];
     let shiftHistory = [];
 
     const catalogSubstances = [
@@ -285,6 +292,29 @@
       buttons[1].className = (tabName === 'tueRegistry') ? 'tab-btn active' : 'tab-btn';
     }
 
+    // Logika pro správu zaškrtávání a povolení tlačítek
+    const checkBanned = document.getElementById('checkBanned');
+    const checkAllowed = document.getElementById('checkAllowed');
+    const approveBtn = document.getElementById('approveBtn');
+    const rejectBtn = document.getElementById('rejectBtn');
+
+    function updateActionButtonsState() {
+      // Tlačítka se aktivují pouze tehdy, když je zaškrtnuta buď Zakázaná, nebo Povolená látka
+      const isSubstanceEvaluated = checkBanned.checked || checkAllowed.checked;
+      approveBtn.disabled = !isSubstanceEvaluated;
+      rejectBtn.disabled = !isSubstanceEvaluated;
+    }
+
+    checkBanned.addEventListener('change', () => {
+      if (checkBanned.checked) checkAllowed.checked = false;
+      updateActionButtonsState();
+    });
+
+    checkAllowed.addEventListener('change', () => {
+      if (checkAllowed.checked) checkBanned.checked = false;
+      updateActionButtonsState();
+    });
+
     function drawRandomIdPhoto() {
       const canvas = document.getElementById('idPhotoCanvas');
       if (!canvas) return;
@@ -322,12 +352,10 @@
       ctx.fillRect(13, 13, 2, 2);
     }
 
-    // Vygeneruje pevný seznam sportovců a WADA TUE registr pro celou dnešní směnu
     function generateDailyRoster() {
       dailyRoster = [];
       dayValidTueList = [];
       
-      // Promícháme jména, abychom z nich na dnešní den vybrali náhodnou vzorkovou sadu
       let shuffledNames = [...athleteNames].sort(() => 0.5 - Math.random());
       
       for (let i = 0; i < targetToCheck; i++) {
@@ -343,7 +371,6 @@
         let isValidInRegistry = false;
         
         if (presentsTue) {
-          // 60% šance, že předložená TUE je reálně platná a zapsaná v registru pro tento den
           isValidInRegistry = Math.random() < 0.6;
           if (isValidInRegistry) {
             dayValidTueList.push({ id: id, name: name, substance: sub.name });
@@ -370,7 +397,6 @@
       renderTueRegistryTab();
     }
 
-    // Vykreslí oficiální registr platných TUE pro daný den
     function renderTueRegistryTab() {
       let registryHTML = `<div style="font-size: 10px; color: var(--adv-gold); font-weight: bold; margin-bottom: 5px;">Oficiální WADA Registr TUE (Den ${currentDay}):</div>`;
       if (dayValidTueList.length === 0) {
@@ -393,9 +419,10 @@
 
       let currentAthlete = dailyRoster[currentCaseIndex];
 
-      document.getElementById('checkBanned').checked = false;
-      document.getElementById('checkAllowed').checked = false;
+      checkBanned.checked = false;
+      checkAllowed.checked = false;
       document.getElementById('checkTueValid').checked = false;
+      updateActionButtonsState(); // Zablokuje tlačítka pro nový případ
 
       document.getElementById('docId').innerText = `ID: ${currentAthlete.id}`;
       document.getElementById('docName').innerText = currentAthlete.name;
@@ -455,9 +482,9 @@
       currentCaseIndex = 0;
       shiftHistory = [];
       initCatalogTable();
-      generateDailyRoster(); // Vygeneruje pevný seznam a naplní TUE registr pro tento den
+      generateDailyRoster();
       updateHUD();
-      loadNextCase();         // Načte prvního sportovce z denní fronty
+      loadNextCase();
     }
 
     function endGame(success) {
@@ -472,7 +499,7 @@
         title.innerText = `DEN ${currentDay} ÚSPĚŠNĚ ZVLÁDNUT`;
         btn.innerText = "DALŠÍ DEN";
         currentDay++;
-        targetToCheck += 2; // Každý další den o něco náročnější
+        targetToCheck += 2;
       } else {
         title.innerText = "PŘÍLIŠ MNOHO CHYB - KÁZEŇSKÝ POSTIH";
         btn.innerText = "ZKUSIT ZNOVU";
