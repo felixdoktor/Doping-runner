@@ -134,7 +134,7 @@
   <div id="desk-container">
     <div class="hud-bar">
       <div>Služba: <span id="dayVal">Den 1</span></div>
-      <div>Zkontrolováno: <span id="checkedVal">0</span>/6</div>
+      <div>Zkontrolováno: <span id="checkedVal">0</span>/<span id="targetVal">6</span></div>
       <div>Chyby: <span id="errorsVal">0</span>/3 ❌</div>
     </div>
 
@@ -205,7 +205,7 @@
     <div class="modal-content">
       <h2 id="modalTitle">Směna inspektora začíná</h2>
       <div id="modalBodyContent">
-        <p id="modalDesc">Prověřujte průkazy, kontrolujte náhodně generované pixelové fotky, porovnávejte látky v katalogu a ověřujte TUE v registru. Pozor na chyby!</p>
+        <p id="modalDesc">Na začátku každého dne se vygeneruje pevný seznam sportovců a oficiální WADA TUE registr pro danou směnu. Ověřujte průkazy, porovnávejte látky a kontrolujte výjimky v registru!</p>
       </div>
       <button class="stamp-btn" id="modalBtn" onclick="startGame()" style="background: var(--adv-blue); color: white; width: 100%; margin-top: 15px;">ZAHÁJIT SMĚNU</button>
     </div>
@@ -214,7 +214,6 @@
   <script type="module">
     import { athleteNames as importedNames } from './resources/names.js';
 
-    // Pojistka pro lokální spouštění (pokud prohlížeč blokuje CORS modulů přes file://)
     const fallbackNames = [
       { name: "Jan Novák", profession: "Atlet / Běžec" },
       { name: "Petr Svoboda", profession: "Silniční cyklista" },
@@ -234,8 +233,9 @@
     const maxErrors = 3;
     let targetToCheck = 6;
 
-    let currentAthlete = null;
-    let activeValidTueIds = [];
+    let dailyRoster = [];       // Pevný seznam sportovců pro aktuální den
+    let currentCaseIndex = 0;   // Index aktuálního sportovce ve frontě
+    let dayValidTueList = [];   // Master seznam platných TUE pro dnešní den
     let shiftHistory = [];
 
     const catalogSubstances = [
@@ -285,7 +285,6 @@
       buttons[1].className = (tabName === 'tueRegistry') ? 'tab-btn active' : 'tab-btn';
     }
 
-    // Automatické generování pixelové občankové fotky (nezávislé na jménu)
     function drawRandomIdPhoto() {
       const canvas = document.getElementById('idPhotoCanvas');
       if (!canvas) return;
@@ -304,15 +303,12 @@
       const hair = hairColors[Math.floor(Math.random() * hairColors.length)];
       const shirt = shirtColors[Math.floor(Math.random() * shirtColors.length)];
 
-      // Tělo / tričko
       ctx.fillStyle = shirt;
       ctx.fillRect(5, 23, 14, 8);
 
-      // Hlava
       ctx.fillStyle = skin;
       ctx.fillRect(7, 8, 10, 12);
 
-      // Vlasy
       ctx.fillStyle = hair;
       ctx.fillRect(7, 7, 10, 4);
       if (Math.random() > 0.5) {
@@ -321,56 +317,81 @@
         ctx.fillRect(16, 9, 2, 4);
       }
 
-      // Oči
       ctx.fillStyle = '#000000';
       ctx.fillRect(9, 13, 2, 2);
       ctx.fillRect(13, 13, 2, 2);
     }
 
-    function generateAthlete() {
-      const athleteObj = athleteNames[Math.floor(Math.random() * athleteNames.length)];
-      const name = athleteObj.name;
-      const sport = athleteObj.profession;
-      const id = `#${Math.floor(1000 + Math.random() * 9000)}`;
+    // Vygeneruje pevný seznam sportovců a WADA TUE registr pro celou dnešní směnu
+    function generateDailyRoster() {
+      dailyRoster = [];
+      dayValidTueList = [];
       
-      const sub = catalogSubstances[Math.floor(Math.random() * catalogSubstances.length)];
-      const presentsTue = Math.random() < 0.35;
+      // Promícháme jména, abychom z nich na dnešní den vybrali náhodnou vzorkovou sadu
+      let shuffledNames = [...athleteNames].sort(() => 0.5 - Math.random());
       
-      activeValidTueIds = [];
-      let tueRegistryText = "<ul>";
-      if (presentsTue && Math.random() < 0.65) {
-        activeValidTueIds.push(id);
-        tueRegistryText += `<li><b>${id}</b> (${name}) – Platná TUE</li>`;
-      } else if (presentsTue) {
-        tueRegistryText += `<li><i>(ID ${id} nenalezeno v registru platných TUE)</i></li>`;
-      } else {
-        tueRegistryText += `<li><i>(Žádný záznam o podané žádosti)</i></li>`;
-      }
-      tueRegistryText += "</ul>";
-      document.getElementById('tueRegistryList').innerHTML = tueRegistryText;
-
-      const isSubstanceBanned = (sub.status === "Zakázaná");
-      const hasValidRegistryTue = activeValidTueIds.includes(id);
-      
-      let shouldBeApproved = false;
-      if (!isSubstanceBanned) {
-        shouldBeApproved = true;
-      } else {
-        if (presentsTue && hasValidRegistryTue) {
+      for (let i = 0; i < targetToCheck; i++) {
+        let athleteObj = shuffledNames[i % shuffledNames.length];
+        let name = athleteObj.name;
+        let sport = athleteObj.profession;
+        let id = `#${Math.floor(1000 + Math.random() * 9000)}`;
+        
+        let sub = catalogSubstances[Math.floor(Math.random() * catalogSubstances.length)];
+        let isSubstanceBanned = (sub.status === "Zakázaná");
+        
+        let presentsTue = Math.random() < 0.35;
+        let isValidInRegistry = false;
+        
+        if (presentsTue) {
+          // 60% šance, že předložená TUE je reálně platná a zapsaná v registru pro tento den
+          isValidInRegistry = Math.random() < 0.6;
+          if (isValidInRegistry) {
+            dayValidTueList.push({ id: id, name: name, substance: sub.name });
+          }
+        }
+        
+        let shouldBeApproved = false;
+        if (!isSubstanceBanned) {
           shouldBeApproved = true;
         } else {
-          shouldBeApproved = false;
+          shouldBeApproved = presentsTue && isValidInRegistry;
         }
+
+        dailyRoster.push({
+          name: name,
+          sport: sport,
+          id: id,
+          substance: sub.name,
+          presentsTue: presentsTue,
+          shouldBeApproved: shouldBeApproved
+        });
       }
 
-      currentAthlete = {
-        name: name,
-        sport: sport,
-        id: id,
-        substance: sub.name,
-        presentsTue: presentsTue,
-        shouldBeApproved: shouldBeApproved
-      };
+      renderTueRegistryTab();
+    }
+
+    // Vykreslí oficiální registr platných TUE pro daný den
+    function renderTueRegistryTab() {
+      let registryHTML = `<div style="font-size: 10px; color: var(--adv-gold); font-weight: bold; margin-bottom: 5px;">Oficiální WADA Registr TUE (Den ${currentDay}):</div>`;
+      if (dayValidTueList.length === 0) {
+        registryHTML += `<div style="font-size: 11px; color: #888;">Pro dnešní den nejsou evidovány žádné platné výjimky.</div>`;
+      } else {
+        registryHTML += `<ul style="padding-left: 15px; margin: 0; font-size: 11px;">`;
+        dayValidTueList.forEach(item => {
+          registryHTML += `<li style="margin-bottom: 5px;"><b>${item.id}</b> - ${item.name}<br><span style="color: #aaa; font-size: 10px;">Látka: ${item.substance}</span></li>`;
+        });
+        registryHTML += `</ul>`;
+      }
+      document.getElementById('tueRegistryList').innerHTML = registryHTML;
+    }
+
+    function loadNextCase() {
+      if (currentCaseIndex >= dailyRoster.length) {
+        endGame(true);
+        return;
+      }
+
+      let currentAthlete = dailyRoster[currentCaseIndex];
 
       document.getElementById('checkBanned').checked = false;
       document.getElementById('checkAllowed').checked = false;
@@ -386,11 +407,11 @@
       tueStatusEl.innerText = currentAthlete.presentsTue ? "Předložena Žádost o TUE" : "Neuvedena";
       tueStatusEl.style.color = currentAthlete.presentsTue ? "#000aff" : "#666";
 
-      // Vykreslení náhodné pixelové fotky
       drawRandomIdPhoto();
     }
 
     window.handleDecision = function(decision) {
+      let currentAthlete = dailyRoster[currentCaseIndex];
       const playerApproved = (decision === 'approve');
       const isCorrect = (playerApproved === currentAthlete.shouldBeApproved);
 
@@ -411,13 +432,12 @@
       }
 
       updateHUD();
+      currentCaseIndex++;
 
       if (errorsCount >= maxErrors) {
         endGame(false);
-      } else if (checkedCount >= targetToCheck) {
-        endGame(true);
       } else {
-        generateAthlete();
+        loadNextCase();
       }
     }
 
@@ -425,16 +445,19 @@
       document.getElementById('checkedVal').innerText = checkedCount;
       document.getElementById('errorsVal').innerText = errorsCount;
       document.getElementById('dayVal').innerText = `Den ${currentDay}`;
+      document.getElementById('targetVal').innerText = targetToCheck;
     }
 
     window.startGame = function() {
       document.getElementById('modalOverlay').style.display = 'none';
       checkedCount = 0;
       errorsCount = 0;
+      currentCaseIndex = 0;
       shiftHistory = [];
       initCatalogTable();
+      generateDailyRoster(); // Vygeneruje pevný seznam a naplní TUE registr pro tento den
       updateHUD();
-      generateAthlete();
+      loadNextCase();         // Načte prvního sportovce z denní fronty
     }
 
     function endGame(success) {
@@ -449,7 +472,7 @@
         title.innerText = `DEN ${currentDay} ÚSPĚŠNĚ ZVLÁDNUT`;
         btn.innerText = "DALŠÍ DEN";
         currentDay++;
-        targetToCheck += 2;
+        targetToCheck += 2; // Každý další den o něco náročnější
       } else {
         title.innerText = "PŘÍLIŠ MNOHO CHYB - KÁZEŇSKÝ POSTIH";
         btn.innerText = "ZKUSIT ZNOVU";
