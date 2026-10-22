@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clean Inspector - Úvod</title>
+  <style>
+    :root {
+      --adv-blue: #000AFF;
+      --adv-gold: #D7C08C;
+      --adv-black: #000000;
+      --adv-white: #FFFFFF;
+    }
+
+    body {
+      margin: 0; background: #1a1a24; color: var(--adv-white);
+      font-family: Arial, sans-serif; 
+      display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+      min-height: 100vh; padding: 20px; box-sizing: border-box;
+    }
+
+    .container {
+      background: #2c2222; border-top: 10px solid var(--adv-gold); border-radius: 8px;
+      padding: 30px; max-width: 600px; width: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      text-align: center; margin-top: 20px; box-sizing: border-box;
+    }
+
+    h1 { color: var(--adv-gold); font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; font-size: 26px; }
+    .subtitle { font-size: 14px; color: #aaa; margin-bottom: 25px; font-weight: bold; }
+    .section-title { color: var(--adv-gold); font-size: 16px; font-weight: bold; margin-top: 20px; margin-bottom: 8px; text-align: left; border-bottom: 2px solid #443333; padding-bottom: 4px; text-transform: uppercase; }
+    p, ul { font-size: 14px; line-height: 1.5; color: #ddd; text-align: left; margin-bottom: 15px; }
+    ul { padding-left: 20px; } li { margin-bottom: 6px; }
+
+    .play-btn-large {
+      background: var(--adv-gold); color: var(--adv-black); border: none; padding: 14px 30px;
+      font-size: 18px; font-weight: bold; border-radius: 30px; cursor: pointer; text-decoration: none;
+      display: inline-block; text-transform: uppercase; margin-top: 20px; box-shadow: 0 4px 15px rgba(215,192,140,0.3);
+    }
+    .play-btn-large:hover { background: var(--adv-white); }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Clean Inspector: Anti-Doping Bureau</h1>
+    <div class="subtitle">Administrativní inspekční simulace (Papers, Please styl)</div>
+
+    <div class="section-title">📌 Účel a zaměření hry</div>
+    <p>Jako službu konající WADA inspektor sedíte na kontrolním stanovišti. Vaším úkolem je ověřovat vzorky sportovců, porovnávat látky v rozsáhlém katalogu a kontrolovat platnost TUE v oficiálním registru.</p>
+
+    <div class="section-title">⚙️ Pravidla inspekce</div>
+    <ul>
+      <li><b>Kontrola látek:</b> Vždy prověřte v příručce, zda je nalezená látka v těle sportovce povolená či zakázaná.</li>
+      <li><b>Ověření TUE:</b> Pokud sportovec deklaruje výjimku, zkontrolujte, zda jeho ID figuruje v denním WADA registru platných TUE.</li>
+      <li><b>Odpovědnost:</b> Každé chybné schválení podvodníka nebo neprávoplatné zastavení čistého sportovce se započítá jako chyba. Tři chyby znamenají konec směny!</li>
+    </ul>
+
+    <div class="section-title">🎮 Zahájit směnu</div>
+    <!-- Zde je odkaz změněný na game2.html -->
+    <a href="game2.html" class="play-btn-large">VSTOUPIT DO KANCELÁŘE ➔</a>
+    <br><br>
+    <a href="index.html" style="color: var(--adv-gold); font-size: 13px; text-decoration: none;">⬅️ Zpět na výběr her</a>
+  </div>
+
+</body>
+</html>
