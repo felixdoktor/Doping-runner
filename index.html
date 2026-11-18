@@ -67,6 +67,64 @@
 
     .inspector-btn { background: #3b2f2f; border-bottom: 3px solid var(--adv-gold); }
     .inspector-btn:hover { background: #554242; }
+
+    /* Styly pro Overlay se zámečkem */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.75); display: none; justify-content: center; align-items: center; z-index: 1000;
+      backdrop-filter: blur(3px);
+    }
+
+    .modal-box {
+      background: var(--adv-white); border-top: 8px solid #3b2f2f; border-radius: 8px;
+      padding: 30px; width: 90%; max-width: 380px; text-align: center;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.5); position: relative;
+    }
+
+    .lock-icon {
+      font-size: 40px; margin-bottom: 10px;
+    }
+
+    .modal-box h3 {
+      margin-top: 0; color: #3b2f2f; font-size: 20px;
+    }
+
+    .modal-box p {
+      font-size: 13px; color: #666; margin-bottom: 20px;
+    }
+
+    .password-input {
+      width: 100%; padding: 10px; box-sizing: border-box; border: 2px solid #ccc;
+      border-radius: 4px; font-size: 14px; text-align: center; margin-bottom: 15px;
+      font-family: monospace;
+    }
+
+    .password-input:focus {
+      border-color: var(--adv-blue); outline: none;
+    }
+
+    .modal-buttons {
+      display: flex; gap: 10px; justify-content: center;
+    }
+
+    .modal-btn {
+      padding: 10px 20px; font-size: 13px; font-weight: bold; border: none; border-radius: 4px;
+      cursor: pointer; text-transform: uppercase;
+    }
+
+    .submit-btn { background: #2e7d32; color: white; }
+    .submit-btn:hover { background: #1b5e20; }
+
+    .cancel-btn { background: #c62828; color: white; }
+    .cancel-btn:hover { background: #b71c1c; }
+
+    .error-msg {
+      color: #c62828; font-size: 12px; font-weight: bold; margin-top: 10px; display: none;
+    }
+
+    footer {
+      margin-top: 20px; font-size: 12px; color: #666;
+    }
   </style>
 </head>
 <body>
@@ -87,23 +145,62 @@
       <div class="game-card">
         <h3>📋 Clean Inspector</h3>
         <p>Administrativní simulace (Papers, Please). Kontroluj vzorky, listuj v katalogu látek a WADA registru.</p>
-        <button class="action-btn inspector-btn" onclick="openInspectorIntro()">ZVOLIT TUTO HRU</button>
+        <button class="action-btn inspector-btn" onclick="openInspectorModal()">ZVOLIT TUTO HRU</button>
       </div>
     </div>
   </div>
 
+  <!-- Overlay okno se zámečkem pro Clean Inspector -->
+  <div id="inspectorModal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="lock-icon">🔒</div>
+      <h3>Zabezpečený přístup</h3>
+      <p>Pro vstup do sekce Clean Inspector zadejte přístupové heslo:</p>
+      
+      <input type="password" id="passwordInput" class="password-input" placeholder="Zadejte heslo..." onkeydown="checkEnter(event)">
+      
+      <div class="modal-buttons">
+        <button class="modal-btn submit-btn" onclick="verifyPassword()">Vstoupit</button>
+        <button class="modal-btn cancel-btn" onclick="closeInspectorModal()">Zrušit</button>
+      </div>
+      
+      <div id="errorMsg" class="error-msg">❌ Chybné heslo! Zkuste to znovu.</div>
+    </div>
+  </div>
+
+  <footer>
+    <p>Authors: Felix Doktor, Šimon Lev, Marek Čumpelík</p>
+  </footer>
+
   <script>
-    function openInspectorIntro() {
-      const pwd = prompt("Zadej heslo pro přístup ke Clean Inspector:");
+    function openInspectorModal() {
+      document.getElementById('inspectorModal').style.display = 'flex';
+      document.getElementById('passwordInput').value = '';
+      document.getElementById('errorMsg').style.display = 'none';
+      document.getElementById('passwordInput').focus();
+    }
+
+    function closeInspectorModal() {
+      document.getElementById('inspectorModal').style.display = 'none';
+    }
+
+    function verifyPassword() {
+      const pwd = document.getElementById('passwordInput').value;
       if (pwd === "fairplay") {
         window.location.href = "inspector-intro.html";
-      } else if (pwd !== null) {
-        alert("Chybné heslo!");
+      } else {
+        const errorEl = document.getElementById('errorMsg');
+        errorEl.style.display = 'block';
+        document.getElementById('passwordInput').value = '';
+        document.getElementById('passwordInput').focus();
+      }
+    }
+
+    function checkEnter(event) {
+      if (event.key === 'Enter') {
+        verifyPassword();
       }
     }
   </script>
- <footer>
-	<p>Authors: Felix Doktor, Šimon Lev, Marek Čumpelík</p>
- </footer>
 </body>
 </html>
