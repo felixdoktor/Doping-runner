@@ -596,13 +596,15 @@
       const rand = Math.random();
       
       let maxHelpAllowed = 1;
-      if (score < 2500) {
-        maxHelpAllowed = 5;
-      } else if (score < 5000) {
-        maxHelpAllowed = 3;
-      } else {
-        maxHelpAllowed = 1;
-      }
+    if (score < 2500) {
+      maxHelpAllowed = 5;
+    } else if (score < 5000) {
+      maxHelpAllowed = 3;
+    } else {
+      // Nad 5000 bodů: za každých dalších 2000 bodů přidáme +1 k limitu
+      const extraBlocks = Math.floor((score - 5000) / 2000);
+      maxHelpAllowed = 1 + extraBlocks;
+    }
       
       let type, imgObj;
       const canSpawnHelp = helpItemsSpawnedCount < maxHelpAllowed && rand > 0.55;
